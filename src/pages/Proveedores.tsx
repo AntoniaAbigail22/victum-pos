@@ -23,7 +23,7 @@ const columns = [
         key: 'phone',
     },
     {
-        title: 'Acciones',
+        title: '',
         key: 'action',
         render: (_: any) => (
             <Space size="middle">
@@ -68,9 +68,19 @@ const Proveedores: React.FC = () => {
         }
     };
 
+    const deleteItem = async () => {
+        try {
+            const response = await deleteProvider({ id })
+            console.log("🚀 ~ deleteProvider ~ response:", response)
+        } catch (error) {
+            console.log("🚀 ~ getProviders ~ error:", error)
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const [provider, setProvider] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
-
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     return (

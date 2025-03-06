@@ -25,3 +25,24 @@ export const indexProviders = async ({
     }
 }
 
+export const deleteProvider = async ({ id }) => {
+    let response = { status: false }
+    try {
+        let fetch = await Fetcher({
+            method: 'DELETE',
+            url: `/provider/${id}`
+        });
+
+
+        console.log("🚀 ~ deleteProvider ~ fetch:", fetch)
+
+        /*if (fetch.status == 200) {
+            response = { status: true, data: fetch?.data };
+        }*/
+    } catch (error) {
+        console.log("🚀 ~ error:", error)
+    } finally {
+        return response
+    }
+}
+

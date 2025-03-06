@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Table, Spin, Button, Input, Space } from 'antd';
+import { Table, Spin, Button, Input } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
 
@@ -98,6 +98,7 @@ const TableList: React.FC<TableListProps> = ({
                 }
             } else if (event.key === 'Enter') {
                 if (selectedRowKey) {
+                    console.log("🚀 ~ handleKeyDown ~ selectedRowKey:", selectedRowKey)
                     handleEdit();
                 }
             } else if (event.key === 'Delete' || event.key === 'Backspace') {
