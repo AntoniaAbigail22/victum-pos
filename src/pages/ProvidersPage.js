@@ -8,16 +8,16 @@ import ModalEditItem from '../components/ModalEditItem';
 import { indexProviders, getBillingByProvider, deleteProvider, createProvider } from "../api/providers/providers"
 import { openNotification } from '../libs/Extras';
 
-const ProvidersPage: React.FC = () => {
+const ProvidersPage = () => {
 
     const [api, contextHolder] = notification.useNotification();
     const sendNotification = (type, description) => openNotification(api, type, description)
 
-    const [data, setData] = useState<[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [page, setPage] = useState<number>(1)
-    const [total, setTotal] = useState<number>(0)
-    const [search, setSearch] = useState<string>("")
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1)
+    const [total, setTotal] = useState(0)
+    const [search, setSearch] = useState("")
     const store = 1;
     const [provider, setProvider] = useState(null);
     const [providerDelete, setProviderDelete] = useState(null);
@@ -112,7 +112,7 @@ const ProvidersPage: React.FC = () => {
         {
             title: 'Nombre',
             key: 'name',
-            render: ({ name, last_name }: { name: string; last_name: string }) => (
+            render: ({ name, last_name }) => (
                 <span>
                     {name} {last_name}
                 </span>
@@ -122,7 +122,7 @@ const ProvidersPage: React.FC = () => {
             title: 'Contacto',
             key: 'contact',
             width: 1,
-            render: ({ phone, email }: { phone: string; email: string }) => (
+            render: ({ phone, email }) => (
                 <span>
                     <span>
                         {phone}
@@ -143,7 +143,7 @@ const ProvidersPage: React.FC = () => {
             title: '',
             key: 'action',
             width: 1,
-            render: (record: { id: number }) => (
+            render: (record) => (
                 <Space size='small'>
                     <Button
                         type='default'
@@ -195,7 +195,7 @@ const ProvidersPage: React.FC = () => {
                 onOpen={onOpen}
                 setProvider={setProvider}
                 isOpen={isOpen}
-                deleteItem={(id: number) => handleModal(id)}
+                deleteItem={(id) => handleModal(id)}
             />
             <ModalEditItem
                 isOpen={isOpen}

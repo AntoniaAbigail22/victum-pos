@@ -19,20 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 
-interface ModalEditItemProps {
-    isOpen: boolean;
-    onClose: any;
-    selectedProvider: number;
-    setSelectedProvider: any;
-    provider: any;
-    setProvider: any;
-    formData01: any;
-    setFormData01: any;
-    formData02: any;
-    setFormData02: any;
-    addProvider: any;
-}
-const ModalEditItem: React.FC<ModalEditItemProps> = ({
+const ModalEditItem = ({
     isOpen,
     onClose,
     selectedProvider,
@@ -87,7 +74,7 @@ const ModalEditItem: React.FC<ModalEditItemProps> = ({
 
     const [tabIndex, setTabIndex] = useState(0);
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event) => {
         if (event.key == "Escape") {
             closeModal()
         }
@@ -110,16 +97,16 @@ const ModalEditItem: React.FC<ModalEditItemProps> = ({
         onClose();
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData01((prev) => ({ ...prev, [name]: value }));
     };
-    const handleChange2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange2 = (e) => {
         const { name, value } = e.target;
         setFormData02((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         setFormData01((prev) => ({ ...prev, ['store_id']: 1 }));
         setFormData02((prev) => ({ ...prev, ['store_id']: 1 }));
