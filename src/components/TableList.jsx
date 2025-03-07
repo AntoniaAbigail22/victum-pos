@@ -46,7 +46,7 @@ const TableList = ({
     deleteItem,
 }) => {
 
-    const [selectedRowKey, setSelectedRowKey] = useState<React.Key | null>(null);
+    const [selectedRowKey, setSelectedRowKey] = useState(null);
     const tableRef = useRef(null);
 
     const handleRowClick = (record) => {
@@ -137,7 +137,7 @@ const TableList = ({
         <Empty
           image={'https://img.icons8.com/fluency/96/000000/nothing-found.png'}
           description="No hay datos disponibles"
-          imageStyle={{ height: 100, justifyContent: 'center', display: 'flex' }}
+          //imageStyle={{ height: 100, justifyContent: 'center', display: 'flex' }}
         >
           <Button type="primary" onClick={handleNew}>Agregar datos</Button>
         </Empty>

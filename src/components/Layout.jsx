@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Dropdown, Avatar, Typography } from 'antd';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Layout, Menu, Typography } from 'antd';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
-import {
-	ShoppingCartOutlined,
-	UserOutlined,
-	AppstoreOutlined,
-	BoxPlotOutlined,
-	TeamOutlined,
-	SettingOutlined,
-	DollarOutlined,
-} from '@ant-design/icons';
 
-const { Header, Content, Sider } = Layout;
-const { Title } = Typography;
+const { Header, Content } = Layout;
 
-
-const LayoutComponent: React.FC = () => {
+const LayoutComponent = () => {
 
 	//const [selectedKey, setSelectedKey] = useState('ventas');
 	const navigate = useNavigate();
@@ -27,7 +16,7 @@ const LayoutComponent: React.FC = () => {
 
 	const [time, setTime] = useState(new Date());
 
-    const formatTime = (date: Date) => {
+    const formatTime = (date) => {
         const hours = date.getHours().toString().padStart(2, "0");
         const minutes = date.getMinutes().toString().padStart(2, "0");
         return `${hours}:${minutes}`;
@@ -52,7 +41,7 @@ const LayoutComponent: React.FC = () => {
 		</Menu>
 	);
 
-	const onClickMenu = (route: any) => {
+	const onClickMenu = (route) => {
 		//setSelectedKey(route);
 		navigate(`/${route}`);
 	}

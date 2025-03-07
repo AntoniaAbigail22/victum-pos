@@ -32,8 +32,8 @@ const options = [
 
 const DirectoryMenu = () => {
 
-    const [selectedRowKey, setSelectedRowKey] = useState<React.Key | null>(null);
-    const tableRef = useRef<HTMLDivElement>(null);
+    const [selectedRowKey, setSelectedRowKey] = useState(null);
+    const tableRef = useRef(null);
 
     const navigate = useNavigate();
 
@@ -53,7 +53,7 @@ const DirectoryMenu = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedRowKey]);
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event) => {
         if (!tableRef.current) return;
     
         const currentIndex = options.findIndex((item) => item?.url === selectedRowKey);

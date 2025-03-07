@@ -10,7 +10,7 @@ if (container) {
   root.render(
     <ChakraProvider>
       <BrowserRouter>
-        <App />
+        <App/>
       </BrowserRouter>
     </ChakraProvider>
   );
