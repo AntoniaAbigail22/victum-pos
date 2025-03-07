@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Dropdown, Avatar, Typography } from 'antd';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
 	ShoppingCartOutlined,
 	UserOutlined,
@@ -14,9 +15,15 @@ import {
 const { Header, Content, Sider } = Layout;
 const { Title } = Typography;
 
+
 const LayoutComponent: React.FC = () => {
-	const [selectedKey, setSelectedKey] = useState('ventas');
+
+	//const [selectedKey, setSelectedKey] = useState('ventas');
 	const navigate = useNavigate();
+
+	const location = useLocation();
+    const { pathname } = location;
+    const basePath = pathname?.split("/")[1];
 
 	const [time, setTime] = useState(new Date());
 
@@ -46,12 +53,16 @@ const LayoutComponent: React.FC = () => {
 	);
 
 	const onClickMenu = (route: any) => {
-		setSelectedKey(route);
+		//setSelectedKey(route);
 		navigate(`/${route}`);
 	}
 	/*={(e) => {
 	  
 	}}*/
+
+	const getUrlUsers = ()=> {
+		
+	}
 
 	return (
 		<Layout style={{ minHeight: '100vh' }}>
@@ -83,29 +94,29 @@ const LayoutComponent: React.FC = () => {
 
 				<nav className="w-full flex items-center bg-blue-600 text-white p-1">
 					<div className='flex flex-col items-center px-4'>
-
+						
 						<span className="text-sm">Caja 1</span>
 						<span className="text-sm">{formatTime(time)}</span>
 					</div>
 
 					<div className="flex flex-grow justify-center">
-						<button className={`px-4 hover:bg-blue-700 hover:text-white rounded flex items-center gap-1 ${selectedKey == "sales" && "bg-white text-blue-700"}`} onClick={() => onClickMenu("sales")}>
+						<button className={`px-4 hover:bg-blue-700 hover:text-white rounded flex items-center gap-1 ${basePath == "sales" && "bg-white text-blue-700"}`} onClick={() => onClickMenu("sales")}>
 							<img width="35" height="35" src="https://img.icons8.com/fluency/48/cash-register.png" alt="cash-register" />
 							<span>Ventas</span>
 						</button>
-						<button className={`px-4 py-2 hover:bg-blue-700 hover:text-white rounded flex items-center gap-1 ${selectedKey == "clients" && "bg-white text-blue-700"}`} onClick={() => onClickMenu("clients")}>
+						<button className={`px-4 py-2 hover:bg-blue-700 hover:text-white rounded flex items-center gap-1 ${basePath == "directory" && "bg-white text-blue-700"}`} onClick={() => onClickMenu("directory")}>
 							<img width="35" height="35" src="https://img.icons8.com/fluency/48/conference-call.png" alt="conference-call" />
-							<span>Clientes</span>
+							<span>Directorio</span>
 						</button>
-						<button className={`px-4 py-2 hover:bg-blue-700 hover:text-white rounded flex items-center gap-1 ${selectedKey == "inventory" && "bg-white text-blue-700"}`} onClick={() => onClickMenu("inventory")}>
+						<button className={`px-4 py-2 hover:bg-blue-700 hover:text-white rounded flex items-center gap-1 ${basePath == "inventory" && "bg-white text-blue-700"}`} onClick={() => onClickMenu("inventory")}>
 							<img width="35" height="35" src="https://img.icons8.com/color/48/move-by-trolley.png" alt="move-by-trolley" />
 							<span>Inventario</span>
 						</button>
-						<button className={`px-4 py-2 hover:bg-blue-700 hover:text-white rounded flex items-center gap-1 ${selectedKey == "providers" && "bg-white text-blue-700"}`} onClick={() => onClickMenu("providers")}>
+						{/*<button className={`px-4 py-2 hover:bg-blue-700 hover:text-white rounded flex items-center gap-1 ${basePath == "providers" && "bg-white text-blue-700"}`} onClick={() => onClickMenu("providers")}>
 							<img width="35" height="35" src="https://img.icons8.com/color/48/supplier.png" alt="supplier" />
 							<span>Proveedores</span>
-						</button>
-						<button className={`px-4 py-2 hover:bg-blue-700 hover:text-white rounded flex items-center gap-1 ${selectedKey == "cut" && "bg-white text-blue-700"}`} onClick={() => onClickMenu("cut")}>
+						</button>*/}
+						<button className={`px-4 py-2 hover:bg-blue-700 hover:text-white rounded flex items-center gap-1 ${basePath == "cut" && "bg-white text-blue-700"}`} onClick={() => onClickMenu("cut")}>
 							<img width="35" height="35" src="https://img.icons8.com/ultraviolet/40/empty-box.png" alt="empty-box" />
 							<span>Corte de Caja</span>
 						</button>

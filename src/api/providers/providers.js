@@ -1,11 +1,12 @@
 import Fetcher from '../../libs/Fetcher';
 
 export const indexProviders = async ({
+    store,
     page,
     search
 }) => {
     let response = { status: false }
-    let params = { page }
+    let params = { store, page }
     if (search)  params.search = search
     
     try {
@@ -13,6 +14,26 @@ export const indexProviders = async ({
             method: 'GET',
             url: `/provider`,
             params
+        });
+
+        if (fetch.status == 200) {
+            response = { status: true, data: fetch?.data };
+        }
+    } catch (error) {
+        console.log("🚀 ~ error:", error)
+    } finally {
+        return response
+    }
+}
+
+export const getBillingByProvider = async ({
+    id
+}) => {
+    let response = { status: false }
+    try {
+        let fetch = await Fetcher({
+            method: 'GET',
+            url: `/provider/billing/${id}`
         });
 
         if (fetch.status == 200) {
@@ -35,7 +56,7 @@ export const deleteProvider = async ({ id }) => {
 
 
         console.log("🚀 ~ deleteProvider ~ fetch:", fetch)
-
+        response = { status: true };
         /*if (fetch.status == 200) {
             response = { status: true, data: fetch?.data };
         }*/
@@ -46,3 +67,35 @@ export const deleteProvider = async ({ id }) => {
     }
 }
 
+export const createProvider = async ({
+    provider,
+    billing
+}) => {
+    console.log("🚀 ~ billing:", billing)
+    console.log("🚀 ~ provider:", provider)
+    let response = { status: false }
+    
+    try {
+        let fetch = await Fetcher({
+            method: 'POST',
+            url: `/provider`,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                provider,
+                billing
+            })
+        });
+
+        console.log("🚀 ~ fetch:", fetch)
+
+        if (fetch.status == 201) {
+            response = { status: true, data: fetch?.data };
+        }
+    } catch (error) {
+        console.log("🚀 ~ error:", error)
+    } finally {
+        return response
+    }
+}

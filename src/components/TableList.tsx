@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Table, Spin, Button, Input } from 'antd';
+import { Table, Spin, Button, Input, Empty } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import type { TableProps } from 'antd';
+import { Text, Code } from '@chakra-ui/react';
 
 interface TableListProps {
     columns: TableProps<any>['columns'];
@@ -17,6 +18,8 @@ interface TableListProps {
     setSelectedProvider: any;
     onOpen: any;
     setProvider: any;
+    isOpen: boolean;
+    deleteItem: any;
 }
 
 interface DataType {
@@ -39,6 +42,8 @@ const TableList: React.FC<TableListProps> = ({
     setSelectedProvider,
     onOpen,
     setProvider,
+    isOpen,
+    deleteItem,
 }) => {
 
     const [selectedRowKey, setSelectedRowKey] = useState<React.Key | null>(null);
@@ -59,12 +64,16 @@ const TableList: React.FC<TableListProps> = ({
 
     const handleNew = () => {
         console.log('Nuevo');
+        onOpen()
     };
 
     const handleEdit = () => {
         if (selectedRowKey) {
+            console.log("🚀 ~ handleEdit ~ selectedRowKey:", selectedRowKey)
             setSelectedProvider(selectedRowKey)
-            setProvider(data.find((item) => item?.id === selectedRowKey));
+            let item = data.find((item) => item?.id === selectedRowKey)
+            setProvider(item);
+            console.log("🚀 ~ handleEdit ~ item:", item)
             onOpen()
         } else {
             console.log('Selecciona una fila para editar');
@@ -74,48 +83,65 @@ const TableList: React.FC<TableListProps> = ({
     const handleDelete = () => {
         if (selectedRowKey) {
             console.log('Eliminar:', selectedRowKey);
+            deleteItem(selectedRowKey)
         } else {
             console.log('Selecciona una fila para eliminar');
         }
     };
 
-
     useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (!tableRef.current) return;
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedRowKey, data]);
 
-            const currentIndex = data.findIndex((item) => item.id === selectedRowKey);
+    const handleKeyDown = (event: KeyboardEvent) => {
+        if (!tableRef.current) return;
 
-            if (event.key === 'ArrowDown') {
-                const nextIndex = currentIndex + 1;
-                if (nextIndex < data.length) {
-                    setSelectedRowKey(data[nextIndex].id);
-                }
-            } else if (event.key === 'ArrowUp') {
-                const prevIndex = currentIndex - 1;
-                if (prevIndex >= 0) {
-                    setSelectedRowKey(data[prevIndex].id);
-                }
-            } else if (event.key === 'Enter') {
-                if (selectedRowKey) {
-                    console.log("🚀 ~ handleKeyDown ~ selectedRowKey:", selectedRowKey)
+        const currentIndex = data.findIndex((item) => item.id === selectedRowKey);
+
+        if (event.key === 'ArrowDown') {
+            const nextIndex = currentIndex + 1;
+            if (nextIndex < data.length) {
+                setSelectedRowKey(data[nextIndex].id);
+            }
+        } else if (event.key === 'ArrowUp') {
+            const prevIndex = currentIndex - 1;
+            if (prevIndex >= 0) {
+                setSelectedRowKey(data[prevIndex].id);
+            }
+        }
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (selectedRowKey) {
+                console.log("🚀 🚀🚀🚀🚀 :", isOpen)
+                if (isOpen == false) {
                     handleEdit();
-                }
-            } else if (event.key === 'Delete' || event.key === 'Backspace') {
-                if (selectedRowKey) {
-                    handleDelete();
+                    console.log("🚀 ~ handleKeyDown ~ selectedRowKey && isOpen:", selectedRowKey, isOpen)
                 }
             }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [selectedRowKey, data]);
+        }
+        else if (event.key === 'Delete' || event.key === 'Backspace') {
+            if (selectedRowKey) {
+                handleDelete();
+            }
+        } else if (event.key == "Escape") {
+            setSelectedRowKey(null)
+        }
+    };
 
     const handleTableChange = (pagination: any) => {
         if (pagination.current !== undefined) changePage(pagination.current);
     };
+
+    const CustomEmpty = () => (
+        <Empty
+          image={'https://img.icons8.com/fluency/96/000000/nothing-found.png'}
+          description="No hay datos disponibles"
+          imageStyle={{ height: 100, justifyContent: 'center', display: 'flex' }}
+        >
+          <Button type="primary" onClick={handleNew}>Agregar datos</Button>
+        </Empty>
+      );
 
     return (
         <div ref={tableRef} className='w-full min-h-[200px] flex flex-col'>
@@ -152,20 +178,21 @@ const TableList: React.FC<TableListProps> = ({
                 type='primary'
                 icon={<PlusOutlined />}
                 onClick={handleNew}
-                className='fixed bottom-4 right-4 shadow-lg rounded'
+                size='large'
+                className='fixed bottom-9 right-2 shadow-lg rounded z-10'
             >
                 {!selectedRowKey && 'Nuevo'}
             </Button>
 
             {loading ?
-                <div className='flex w-full h-screen items-center justify-center'>
+                <div className='flex w-full h-[80vh] items-center justify-center'>
                     <Spin size="large" />
                 </div>
                 : <Table
                     columns={columns}
                     dataSource={data}
                     rowKey="id"
-                    className='w-full custom-table'
+                    className='w-full custom-table pb-16'
                     bordered
                     pagination={{
                         current: current,
@@ -181,8 +208,25 @@ const TableList: React.FC<TableListProps> = ({
                     rowClassName={(record) =>
                         record.id === selectedRowKey ? 'bg-blue-100' : ''
                     }
+                    locale={{
+                        emptyText: <CustomEmpty />
+                      }}
                 />
             }
+            <div className='fixed bottom-0 left-0 bg-slate-100 w-full p-1'>
+                <Text fontSize="sm" fontWeight="thin" color="gray.600">
+                    <Text fontSize="xs" fontWeight="thin" color="gray.600">
+                        {!selectedRowKey ? "Selecciona un elemento para ver las opciones disponibles" :
+                            <>
+                                <Code fontWeight="bold" colorScheme='blackAlpha'>↓</Code> para navegar hacia abajo,{" "}
+                                <Code fontWeight="bold" colorScheme='blackAlpha'>↑</Code> para navegar hacia arriba,{" "}
+                                <Code fontWeight="bold" colorScheme='blackAlpha'>Supr/Delete</Code> para eliminar,{" "}
+                                <Code fontWeight="bold" colorScheme='blackAlpha'>Enter</Code> o <Code fontWeight="bold" colorScheme='blackAlpha'>Doble Click</Code> para modificar
+                            </>
+                        }
+                    </Text>
+                </Text>
+            </div>
         </div>
     );
 };

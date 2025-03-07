@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { Button, Modal, Space, notification } from 'antd';
+import { ExclamationCircleFilled, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Code, Text, useDisclosure, Box } from "@chakra-ui/react";
+import { ChevronRightIcon } from '@chakra-ui/icons'
 import TableList from '../components/TableList';
-import { indexProviders, getBillingByProvider, deleteProvider } from "../api/providers/providers"
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Code, Text, useDisclosure } from "@chakra-ui/react";
-import { Box } from "@chakra-ui/react";
 import ModalEditItem from '../components/ModalEditItem';
-import { ExclamationCircleFilled } from '@ant-design/icons';
-import { Button, Modal, Space } from 'antd';
+import { indexProviders, getBillingByProvider, deleteProvider, createProvider } from "../api/providers/providers"
+import { openNotification } from '../libs/Extras';
 
-const Proveedores: React.FC = () => {
+const ProvidersPage: React.FC = () => {
+
+    const [api, contextHolder] = notification.useNotification();
+    const sendNotification = (type, description) => openNotification(api, type, description)
 
     const [data, setData] = useState<[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -19,9 +22,11 @@ const Proveedores: React.FC = () => {
     const [provider, setProvider] = useState(null);
     const [providerDelete, setProviderDelete] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
+    const [formData01, setFormData01] = useState(null);
+    const [formData02, setFormData02] = useState(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
-
     const [isModalOpen, setIsModalOpen] = useState(false);
+
     const handleModal = (id) => {
         if (id) {
             let item = data.find((item) => item?.id === id)
@@ -37,9 +42,7 @@ const Proveedores: React.FC = () => {
     }, [page, search]);
 
     useEffect(() => {
-        if (selectedProvider && provider?.id) {
-            getBilling()
-        }
+        if (selectedProvider && provider?.id) getBilling()
     }, [selectedProvider, provider?.id]);
 
 
@@ -57,30 +60,55 @@ const Proveedores: React.FC = () => {
         }
     };
 
+    const addProvider = async () => {
+        try {
+            const response = await createProvider({ provider: formData01, billing: formData02 })
+            if (response?.status) {
+                sendNotification('success', `Se agrego al proveedor ${response?.data?.provider?.name} ${response?.data?.provider?.last_name} con éxito`)
+                onClose()
+            }
+            else sendNotification('error')
+            console.log("🚀 ~ addProvider ~ response:", response)
+        } catch (error) {
+            console.log("🚀 ~ getProviders ~ error:", error)
+        } finally {
+            getProviders()
+        }
+    };
+
 
     const getBilling = async () => {
         try {
             const response = await getBillingByProvider({ id: selectedProvider })
-            if (response?.status) {
-                setProvider({ ...provider, billing: response?.data });
-            }
+            if (response?.status) setProvider({ ...provider, billing: response?.data });
         } catch (error) {
             console.log("🚀 ~ getProviders ~ error:", error)
-        } finally {
-
         }
     };
 
     const deleteItem = async ({ id }) => {
         try {
-            const response = await deleteProvider({ id })
-            console.log("🚀 ~ deleteProvider ~ response:", response)
+            let response = await deleteProvider({ id })
+            if (response?.status) sendNotification('success', 'Proveedor eliminado con éxito')
+            else sendNotification('error')
         } catch (error) {
-            console.log("🚀 ~ deleteProvider ~ error:", error)
+            console.error("🚀 ~ deleteProvider ~ error:", error)
+        } finally {
+            getProviders()
         }
     };
 
     const columns = [
+        {
+            title: '#',
+            key: 'index',
+            width: 1,
+            render: (_, __, index) => (
+                <span className='font-bold italic'>
+                    {(page - 1) * 10 + index + 1}
+                </span>
+            ),
+        },
         {
             title: 'Nombre',
             key: 'name',
@@ -91,13 +119,9 @@ const Proveedores: React.FC = () => {
             ),
         },
         {
-            title: 'Empresa',
-            dataIndex: 'company',
-            key: 'company',
-        },
-        {
             title: 'Contacto',
             key: 'contact',
+            width: 1,
             render: ({ phone, email }: { phone: string; email: string }) => (
                 <span>
                     <span>
@@ -110,6 +134,12 @@ const Proveedores: React.FC = () => {
             ),
         },
         {
+            title: 'Empresa',
+            dataIndex: 'company',
+            key: 'company',
+            width: 1,
+        },
+        {
             title: '',
             key: 'action',
             width: 1,
@@ -118,7 +148,7 @@ const Proveedores: React.FC = () => {
                     <Button
                         type='default'
                         icon={<DeleteOutlined />}
-                        onClick={() => handleModal(record?.id) /*deleteItem({ id: record?.id })*/}
+                        onClick={() => handleModal(record?.id)}
                     />
                     <Button
                         type='default'
@@ -126,7 +156,6 @@ const Proveedores: React.FC = () => {
                         onClick={() => {
                             setSelectedProvider(record?.id)
                             setProvider(record);
-                            console.log("🚀 ~ handleEdit ~ item:", record)
                             onOpen()
                         }}
                     />
@@ -137,8 +166,17 @@ const Proveedores: React.FC = () => {
 
     return (
         <div className="w-full flex flex-col p-2">
+            {contextHolder}
             <Box width="100%">
-                <Text as="h1" fontSize="xl" color="blue.700" p={1}>
+                <Breadcrumb spacing='8px' px={1} separator={<ChevronRightIcon color='gray.500' />}>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href='/directory'>Directorio</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink href='#'>Proveedores</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </Breadcrumb>
+                <Text as="h1" fontSize="xl" color="blue.700" p={1} pt={0}>
                     Proveedores
                 </Text>
             </Box>
@@ -157,7 +195,7 @@ const Proveedores: React.FC = () => {
                 onOpen={onOpen}
                 setProvider={setProvider}
                 isOpen={isOpen}
-                deleteItem={deleteItem}
+                deleteItem={(id: number) => handleModal(id)}
             />
             <ModalEditItem
                 isOpen={isOpen}
@@ -166,32 +204,30 @@ const Proveedores: React.FC = () => {
                 setSelectedProvider={setSelectedProvider}
                 provider={provider}
                 setProvider={setProvider}
+                formData01={formData01}
+                setFormData01={setFormData01}
+                formData02={formData02}
+                setFormData02={setFormData02}
+                addProvider={addProvider}
             />
 
             <Modal
-                title={
-                    <span>
-                        <ExclamationCircleFilled style={{ color: '#faad14', marginRight: 8 }} />
-                        ¿Eliminar proveedor?
-                    </span>
-                }
+                title={<span><ExclamationCircleFilled style={{ color: '#faad14', marginRight: 8 }} />¿Eliminar proveedor?</span>}
                 open={isModalOpen}
                 onOk={() => {
                     deleteItem({ id: providerDelete?.id })
                     handleModal()
                 }}
-                 onCancel={handleModal} centered okType='danger' okText='Eliminar'>
+                onCancel={handleModal} centered okType='danger' okText='Eliminar'>
                 <div className='px-6'>
-                    <p>¿Estás seguro de que deseas eliminar al proveedor <Code fontWeight="bold" colorScheme='blackAlpha'>{providerDelete?.name} {providerDelete?.last_name}</Code>? 
-                    <br/> Esta acción no se puede deshacer.</p>
+                    <p>¿Estás seguro de que deseas eliminar al proveedor <Code fontWeight="bold" colorScheme='blackAlpha'>{providerDelete?.name} {providerDelete?.last_name}</Code>?
+                        <br /> Esta acción no se puede deshacer.</p>
                 </div>
-
                 <Box mt={2} width="full" position={'absolute'} left={10}>
                     <div className='fixed bottom-0 left-0 bg-slate-200 w-full p-1'>
                         <Text fontSize="sm" fontWeight="thin" color="gray.600">
                             <Text fontSize="xs" fontWeight="thin" color="gray.600">
-                                <Code fontWeight="bold" colorScheme='blackAlpha'>Esc</Code> para cerrar ventana,{" "}
-                                <Code fontWeight="bold" colorScheme='blackAlpha'>→</Code> o <Code fontWeight="bold" colorScheme='blackAlpha'>←</Code> para navegar entre las opciones{" "}
+                                <Code fontWeight="bold" colorScheme='blackAlpha'>Esc</Code> para cerrar ventana
                             </Text>
                         </Text>
                     </div>
@@ -201,4 +237,4 @@ const Proveedores: React.FC = () => {
     );
 };
 
-export default Proveedores;
+export default ProvidersPage;
