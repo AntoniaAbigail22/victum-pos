@@ -103,7 +103,7 @@ const DirectoryMenu = () => {
                 </Breadcrumb>
             </Box>
             <div className="flex justify-center items-center h-[85vh]">
-                <div ref={tableRef} className="grid grid-cols-3 md:grid-cols-3 gap-6 p-6 max-w-4xl w-full">
+                <div ref={tableRef} className="grid sm:grid-cols-1 grid-cols-1 md:grid-cols-3 gap-6 p-6 max-w-4xl w-full">
                     {options.map((option, index) => (
                         <NavLink
                             key={`directory-${option?.url}-${index}`}
@@ -112,7 +112,9 @@ const DirectoryMenu = () => {
                             className={({ isActive }) =>
                                 `block 
                                 bg-white 
-                                p-6 rounded-lg 
+                                md:p-6 
+                                p-3
+                                rounded-lg 
                                 shadow-md text-center
                                 hover:shadow-lg transition-shadow duration-300 
                                 ${isActive || selectedRowKey === option.url 

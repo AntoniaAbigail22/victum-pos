@@ -3,7 +3,6 @@ import { Table, Space, Spin, message } from 'antd';
 import type { TableProps } from 'antd';
 
 export interface Main {
-    id: number;
     name: string;
     phone: string;
     email: string;
