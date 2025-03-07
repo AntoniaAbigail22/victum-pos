@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Table, Spin, Button, Input, Empty } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
-import type { TableProps } from 'antd';
+//import type { TableProps } from 'antd';
 import { Text, Code } from '@chakra-ui/react';
 
-interface TableListProps {
+/*interface TableListProps {
     columns: TableProps<any>['columns'];
     data: any[];
     loading: boolean;
@@ -26,9 +26,9 @@ interface DataType {
     id: string;
     company: string;
     phone: number;
-}
+}*/
 
-const TableList: React.FC<TableListProps> = ({
+const TableList = ({
     columns,
     data,
     loading,
@@ -47,14 +47,14 @@ const TableList: React.FC<TableListProps> = ({
 }) => {
 
     const [selectedRowKey, setSelectedRowKey] = useState<React.Key | null>(null);
-    const tableRef = useRef<HTMLDivElement>(null);
+    const tableRef = useRef(null);
 
-    const handleRowClick = (record: DataType) => {
+    const handleRowClick = (record) => {
         setSelectedRowKey(record.id);
         setSelectedProvider(record?.id)
     };
 
-    const handleSearch = (value: string) => {
+    const handleSearch = (value) => {
         searchItem(value);
 
         if (value === "") setSelectedRowKey(null);
@@ -94,7 +94,7 @@ const TableList: React.FC<TableListProps> = ({
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedRowKey, data]);
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event) => {
         if (!tableRef.current) return;
 
         const currentIndex = data.findIndex((item) => item.id === selectedRowKey);
@@ -129,7 +129,7 @@ const TableList: React.FC<TableListProps> = ({
         }
     };
 
-    const handleTableChange = (pagination: any) => {
+    const handleTableChange = (pagination) => {
         if (pagination.current !== undefined) changePage(pagination.current);
     };
 
