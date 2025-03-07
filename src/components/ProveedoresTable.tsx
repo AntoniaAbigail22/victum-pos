@@ -53,7 +53,7 @@ const columns: TableProps<Main>['columns'] = [
     {
         title: 'Acciones',
         key: 'action',
-        render: (_, record) => (
+        render: (_) => (
             <Space size="middle">
                 <a href="#">Editar</a>
                 <a href="#">Eliminar</a>
