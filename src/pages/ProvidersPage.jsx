@@ -240,10 +240,7 @@ const ProvidersPage = () => {
                 <Modal
                     title={<span><ExclamationCircleFilled style={{ color: '#faad14', marginRight: 8 }} />¿Eliminar proveedor?</span>}
                     open={isModalOpen}
-                    onOk={() => {
-                        deleteItem({ id: providerDelete?.id })
-                        //setIsModalOpen(false);
-                    }}
+                    onOk={() => deleteItem({ id: providerDelete?.id })}
                     onCancel={() => setIsModalOpen(false)} centered okType='danger' okText='Eliminar'>
                     <div className='px-6'>
                         <p>¿Estás seguro de que deseas eliminar al proveedor

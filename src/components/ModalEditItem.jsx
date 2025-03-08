@@ -18,12 +18,9 @@ const ModalEditItem = ({
     updateProvider
 }) => {
 
-
-
     useEffect(() => {
         if (provider) {
             setFormData01({
-                //id: provider.id || "",
                 name: provider.name || "",
                 last_name: provider.last_name || "",
                 address: provider.address || "",
@@ -37,7 +34,6 @@ const ModalEditItem = ({
                 comment: provider?.comment || ""
             });
             setFormData02({
-                //id: provider?.billing?.id || "",
                 company: provider?.billing?.company || "",
                 rfc: provider?.billing?.rfc || "",
                 curp: provider?.billing?.curp || "",
@@ -73,18 +69,6 @@ const ModalEditItem = ({
         } else if (event.key === 'ArrowRight') {
             setTabIndex((prevIndex) => (prevIndex < 1 ? prevIndex + 1 : prevIndex));
         }
-    };
-
-    const handleOpen = () => {
-        if (provider) {
-            setFormData01(provider);
-        }
-        //onOpen();
-    };
-
-    const handleSave = () => {
-        console.log(formData01);
-        onClose();
     };
 
     const handleChange = (e) => {
@@ -172,7 +156,7 @@ const ModalEditItem = ({
                     <Box as="form" onSubmit={handleSubmit} paddingTop={1}>
                         <Tabs index={tabIndex} onChange={(index) => setTabIndex(index)}>
                             <TabList>
-                                <Tab>Datos generales</Tab>
+                                <Tab>Datos generales<span className='text-red-500'>*</span></Tab>
                                 <Tab>Facturación</Tab>
                             </TabList>
                             <TabPanels>
@@ -180,7 +164,7 @@ const ModalEditItem = ({
                                     <Grid templateColumns="repeat(2, 1fr)" gap={3}>
                                         <GridItem colSpan={1}>
                                             <FormControl>
-                                                <FormLabel>Nombre de la empresa</FormLabel>
+                                                <FormLabel>Nombre de la empresa<span className='text-red-500'>*</span></FormLabel>
                                                 <Input
                                                     name="company"
                                                     value={formData01?.company}
@@ -196,7 +180,7 @@ const ModalEditItem = ({
                                         </GridItem>
                                         <GridItem>
                                             <FormControl>
-                                                <FormLabel>ID Asignado</FormLabel>
+                                                <FormLabel>ID Asignado<span className='text-red-500'>*</span></FormLabel>
                                                 <Input
                                                     name="id_asiggned_me"
                                                     value={formData01?.id_asiggned_me}
@@ -212,12 +196,12 @@ const ModalEditItem = ({
                                         </GridItem>
                                         <GridItem>
                                             <FormControl>
-                                                <FormLabel>Nombre</FormLabel>
+                                                <FormLabel>Nombre<span className='text-red-500'>*</span></FormLabel>
                                                 <Input
                                                     name="name"
                                                     value={formData01?.name}
                                                     onChange={handleChange}
-                                                    placeholder="Apellidos"
+                                                    placeholder="Nombre(s)"
                                                 />
                                                 {errors?.name &&
                                                     <FormHelperText color={'red.500'}>
@@ -228,7 +212,7 @@ const ModalEditItem = ({
                                         </GridItem>
                                         <GridItem colSpan={1}>
                                             <FormControl>
-                                                <FormLabel>Apellidos</FormLabel>
+                                                <FormLabel>Apellidos<span className='text-red-500'>*</span></FormLabel>
                                                 <Input
                                                     name="last_name"
                                                     value={formData01?.last_name}
@@ -246,7 +230,7 @@ const ModalEditItem = ({
 
                                         <GridItem>
                                             <FormControl>
-                                                <FormLabel>RFC</FormLabel>
+                                                <FormLabel>RFC<span className='text-red-500'>*</span></FormLabel>
                                                 <Input
                                                     name="rfc"
                                                     value={formData01?.rfc}
@@ -263,7 +247,7 @@ const ModalEditItem = ({
                                         </GridItem>
                                         <GridItem colSpan={1}>
                                             <FormControl>
-                                                <FormLabel>CURP</FormLabel>
+                                                <FormLabel>CURP<span className='text-red-500'>*</span></FormLabel>
                                                 <Input
                                                     name="curp"
                                                     value={formData01?.curp}
@@ -281,7 +265,7 @@ const ModalEditItem = ({
 
                                         <GridItem>
                                             <FormControl>
-                                                <FormLabel>Teléfono</FormLabel>
+                                                <FormLabel>Teléfono<span className='text-red-500'>*</span></FormLabel>
                                                 <Input
                                                     name="phone"
                                                     value={formData01?.phone}
@@ -298,7 +282,7 @@ const ModalEditItem = ({
                                         </GridItem>
                                         <GridItem colSpan={1}>
                                             <FormControl>
-                                                <FormLabel>Email</FormLabel>
+                                                <FormLabel>Email<span className='text-red-500'>*</span></FormLabel>
                                                 <Input
                                                     name="email"
                                                     value={formData01?.email}
@@ -322,7 +306,7 @@ const ModalEditItem = ({
 
                                         <GridItem colSpan={2}>
                                             <FormControl>
-                                                <FormLabel>Comentarios</FormLabel>
+                                                <FormLabel>Comentarios<span className='text-red-500'>*</span></FormLabel>
                                                 <Input
                                                     name="comment"
                                                     value={formData01?.comment}
