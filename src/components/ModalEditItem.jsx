@@ -1,23 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Button,
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    ModalCloseButton,
-    FormControl,
-    FormLabel,
-    Input,
-    Grid,
-    GridItem,
-    Box,
-    Text,
-    Code,
-} from "@chakra-ui/react";
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
+    Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, Input, Grid, GridItem, Box, Text, Code, Tabs, TabList, TabPanels, Tab, TabPanel
+} from '@chakra-ui/react'
 
 const ModalEditItem = ({
     isOpen,
@@ -33,12 +17,12 @@ const ModalEditItem = ({
     addProvider,
 }) => {
 
-
     useEffect(() => {
         if (provider) {
             setFormData01({
                 //id: provider.id || "",
                 name: provider.name || "",
+                last_name: provider.last_name || "",
                 address: provider.address || "",
                 phone: provider.phone || "",
                 email: provider?.email || "",
@@ -47,6 +31,7 @@ const ModalEditItem = ({
                 curp: provider?.curp || "",
                 id_asiggned_me: provider?.id_asiggned_me || "",
                 created_at: provider?.created_at || "",
+                comment: provider?.comment || ""
             });
             setFormData02({
                 //id: provider?.billing?.id || "",
@@ -62,8 +47,10 @@ const ModalEditItem = ({
                 local: provider?.billing?.local || "",
                 state: provider?.billing?.state || "",
                 pais: provider?.billing?.pais || "",
-
             });
+        } else {
+            setFormData01(null);
+            setFormData02(null);
         }
     }, [provider]);
 
@@ -232,7 +219,7 @@ const ModalEditItem = ({
                                                 />
                                             </FormControl>
                                         </GridItem>
-                                       
+
                                         {provider?.id &&
                                             <GridItem>
                                                 <FormControl>

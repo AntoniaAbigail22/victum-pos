@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Table, Spin, Button, Input, Empty } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
-//import type { TableProps } from 'antd';
 import { Text, Code } from '@chakra-ui/react';
 
+//import type { TableProps } from 'antd';
 /*interface TableListProps {
     columns: TableProps<any>['columns'];
     data: any[];
@@ -114,14 +114,14 @@ const TableList = ({
             event.preventDefault();
             if (selectedRowKey) {
                 console.log("🚀 🚀🚀🚀🚀 :", isOpen)
-                if (isOpen == false) {
+                if (isOpen == false && data.length > 0) {
                     handleEdit();
                     console.log("🚀 ~ handleKeyDown ~ selectedRowKey && isOpen:", selectedRowKey, isOpen)
                 }
             }
         }
         else if (event.key === 'Delete' || event.key === 'Backspace') {
-            if (selectedRowKey) {
+            if (selectedRowKey && selectedProvider) {
                 handleDelete();
             }
         } else if (event.key == "Escape") {
@@ -137,7 +137,8 @@ const TableList = ({
         <Empty
           image={'https://img.icons8.com/fluency/96/000000/nothing-found.png'}
           description="No hay datos disponibles"
-          //imageStyle={{ height: 100, justifyContent: 'center', display: 'flex' }}
+          imageStyle={{ height: 100, justifyContent: 'center', display: 'flex' }}
+          className='h-[250px] flex flex-col justify-center align-middle'
         >
           <Button type="primary" onClick={handleNew}>Agregar datos</Button>
         </Empty>
@@ -194,6 +195,7 @@ const TableList = ({
                     rowKey="id"
                     className='w-full custom-table pb-16'
                     bordered
+                    size="small"
                     pagination={{
                         current: current,
                         pageSize: 10,

@@ -7,7 +7,7 @@ export const indexProviders = async ({
 }) => {
     let response = { status: false }
     let params = { store, page }
-    if (search)  params.search = search
+    if (search) params.search = search
     
     try {
         let fetch = await Fetcher({

@@ -108,7 +108,7 @@ const DirectoryMenu = () => {
                         <NavLink
                             key={`directory-${option?.url}-${index}`}
                             to={`/directory/${option?.url}`}
-                            data-url={option.url} 
+                            data-url={option.url}
                             className={({ isActive }) =>
                                 `block 
                                 bg-white 
@@ -141,7 +141,6 @@ const DirectoryMenu = () => {
                     <div className='fixed bottom-0 left-0 bg-slate-200 w-full p-1'>
                         <Text fontSize="sm" fontWeight="thin" color="gray.600">
                             <Text fontSize="xs" fontWeight="thin" color="gray.600">
-                               
                                 <Code fontWeight="bold" colorScheme='blackAlpha'>TAB ↓ ↑ → ←</Code>, para navegar entre las opciones, {" "}
                                 <Code fontWeight="bold" colorScheme='blackAlpha'>Enter</Code> para seleccionar
                             </Text>

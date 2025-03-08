@@ -83,7 +83,6 @@ const LayoutComponent = () => {
 
 				<nav className="w-full flex items-center bg-blue-600 text-white p-1">
 					<div className='flex flex-col items-center px-4'>
-						
 						<span className="text-sm">Caja 1</span>
 						<span className="text-sm">{formatTime(time)}</span>
 					</div>

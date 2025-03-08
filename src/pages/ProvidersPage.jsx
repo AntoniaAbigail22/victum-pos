@@ -5,8 +5,8 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, Code, Text, useDisclosure, 
 import { ChevronRightIcon } from '@chakra-ui/icons'
 import TableList from '../components/TableList';
 import ModalEditItem from '../components/ModalEditItem';
-import { indexProviders, getBillingByProvider, deleteProvider, createProvider } from "../api/providers/providers"
 import { openNotification } from '../libs/Extras';
+import { indexProviders, getBillingByProvider, deleteProvider, createProvider } from "../api/providers/providers"
 
 const ProvidersPage = () => {
 
@@ -27,16 +27,6 @@ const ProvidersPage = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleModal = (id) => {
-        if (id) {
-            let item = data.find((item) => item?.id === id)
-            console.log("🚀 ~ handleModal ~ item:", item)
-            setProviderDelete(item);
-        }
-        setIsModalOpen(!isModalOpen);
-    };
-
-
     useEffect(() => {
         getProviders();
     }, [page, search]);
@@ -53,10 +43,16 @@ const ProvidersPage = () => {
                 setData(response?.data?.data)
                 setTotal(response?.data?.total)
             }
+            console.log("🚀 ~ getProviders ~ response:", response)
+            if (response?.data?.total == 0 || response?.data?.data.length == 0) {
+                setProvider(null);
+                setSelectedProvider(null);
+            }
         } catch (error) {
             console.log("🚀 ~ getProviders ~ error:", error)
         } finally {
             setLoading(false);
+            setProviderDelete(null)
         }
     };
 
@@ -94,7 +90,20 @@ const ProvidersPage = () => {
         } catch (error) {
             console.error("🚀 ~ deleteProvider ~ error:", error)
         } finally {
+            setProvider(null);
+            setSelectedProvider(null);
+            setProviderDelete(null)
             getProviders()
+            setIsModalOpen(false);
+        }
+    };
+
+    const handleModal = (id) => {
+        if (id) {
+            let item = data.find((item) => item?.id === id)
+            console.log("🚀 ~ handleModal ~ item:", item)
+            setProviderDelete(item);
+            setIsModalOpen(!isModalOpen);
         }
     };
 
@@ -216,9 +225,9 @@ const ProvidersPage = () => {
                 open={isModalOpen}
                 onOk={() => {
                     deleteItem({ id: providerDelete?.id })
-                    handleModal()
+                    //setIsModalOpen(false);
                 }}
-                onCancel={handleModal} centered okType='danger' okText='Eliminar'>
+                onCancel={() => setIsModalOpen(false)} centered okType='danger' okText='Eliminar'>
                 <div className='px-6'>
                     <p>¿Estás seguro de que deseas eliminar al proveedor <Code fontWeight="bold" colorScheme='blackAlpha'>{providerDelete?.name} {providerDelete?.last_name}</Code>?
                         <br /> Esta acción no se puede deshacer.</p>
