@@ -123,7 +123,7 @@ const TableList = ({
                 }
             }
         } else if (event.key === 'Delete' || event.key === 'Backspace') {
-            if (selectedRowKey && selectedProvide) {
+            if (selectedRowKey && selectedProvider) {
                 handleDelete();
             }
         } else if (event.key == "Escape") {
