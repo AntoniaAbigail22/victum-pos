@@ -119,9 +119,8 @@ const TableList = ({
                     console.log("🚀 ~ handleKeyDown ~ selectedRowKey && isOpen:", selectedRowKey, isOpen)
                 }
             }
-        }
-        else if (event.key === 'Delete' || event.key === 'Backspace') {
-            if (selectedRowKey && selectedProvider) {
+        } else if (event.key === 'Delete' || event.key === 'Backspace') {
+            if (selectedRowKey && selectedProvide) {
                 handleDelete();
             }
         } else if (event.key == "Escape") {
@@ -175,15 +174,17 @@ const TableList = ({
                 </div>
             </div>
 
-            <Button
-                type='primary'
-                icon={<PlusOutlined />}
-                onClick={handleNew}
-                size='large'
-                className='fixed bottom-9 right-2 shadow-lg rounded z-10'
-            >
-                {!selectedRowKey && 'Nuevo'}
-            </Button>
+            {newItem &&
+                <Button
+                    type='primary'
+                    icon={<PlusOutlined />}
+                    onClick={handleNew}
+                    size='large'
+                    className='fixed bottom-9 right-2 shadow-lg rounded z-10'
+                >
+                    {!selectedRowKey && 'Nuevo'}
+                </Button>
+            }
 
             {loading ?
                 <div className='flex w-full h-[80vh] items-center justify-center'>

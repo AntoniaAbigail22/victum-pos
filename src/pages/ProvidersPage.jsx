@@ -6,7 +6,7 @@ import { ChevronRightIcon } from '@chakra-ui/icons'
 import TableList from '../components/TableList';
 import ModalEditItem from '../components/ModalEditItem';
 import { openNotification } from '../libs/Extras';
-import { indexProviders, getBillingByProvider, deleteProvider, createProvider } from "../api/providers/providers"
+import { indexProviders, getBillingByProvider, deleteProvider, createProvider, upProvider } from "../api/providers/providers"
 
 const ProvidersPage = () => {
 
@@ -72,6 +72,21 @@ const ProvidersPage = () => {
         }
     };
 
+    const updateProvider = async () => {
+        try {
+            const response = await upProvider({ provider: formData01, billing: formData02, id: selectedProvider || provider?.id })
+            if (response?.status) {
+                sendNotification('success', `Se actualizó al proveedor ${provider?.name} ${provider?.last_name} con éxito`)
+                onClose()
+            }
+            else sendNotification('error')
+            console.log("🚀 ~ updateProvider ~ response:", response)
+        } catch (error) {
+            console.log("🚀 ~ updateProvider ~ error:", error)
+        } finally {
+            getProviders()
+        }
+    };
 
     const getBilling = async () => {
         try {
@@ -218,30 +233,34 @@ const ProvidersPage = () => {
                 formData02={formData02}
                 setFormData02={setFormData02}
                 addProvider={addProvider}
+                updateProvider={updateProvider}
             />
 
-            <Modal
-                title={<span><ExclamationCircleFilled style={{ color: '#faad14', marginRight: 8 }} />¿Eliminar proveedor?</span>}
-                open={isModalOpen}
-                onOk={() => {
-                    deleteItem({ id: providerDelete?.id })
-                    //setIsModalOpen(false);
-                }}
-                onCancel={() => setIsModalOpen(false)} centered okType='danger' okText='Eliminar'>
-                <div className='px-6'>
-                    <p>¿Estás seguro de que deseas eliminar al proveedor <Code fontWeight="bold" colorScheme='blackAlpha'>{providerDelete?.name} {providerDelete?.last_name}</Code>?
-                        <br /> Esta acción no se puede deshacer.</p>
-                </div>
-                <Box mt={2} width="full" position={'absolute'} left={10}>
-                    <div className='fixed bottom-0 left-0 bg-slate-200 w-full p-1'>
-                        <Text fontSize="sm" fontWeight="thin" color="gray.600">
-                            <Text fontSize="xs" fontWeight="thin" color="gray.600">
-                                <Code fontWeight="bold" colorScheme='blackAlpha'>Esc</Code> para cerrar ventana
-                            </Text>
-                        </Text>
+            {!isOpen &&
+                <Modal
+                    title={<span><ExclamationCircleFilled style={{ color: '#faad14', marginRight: 8 }} />¿Eliminar proveedor?</span>}
+                    open={isModalOpen}
+                    onOk={() => {
+                        deleteItem({ id: providerDelete?.id })
+                        //setIsModalOpen(false);
+                    }}
+                    onCancel={() => setIsModalOpen(false)} centered okType='danger' okText='Eliminar'>
+                    <div className='px-6'>
+                        <p>¿Estás seguro de que deseas eliminar al proveedor
+                            <Code fontWeight="bold" colorScheme='blackAlpha'>{providerDelete?.name} {providerDelete?.last_name}</Code>?
+                            <br /> Esta acción no se puede deshacer.</p>
                     </div>
-                </Box>
-            </Modal>
+                    <Box mt={2} width="full" position={'absolute'} left={10}>
+                        <div className='fixed bottom-0 left-0 bg-slate-200 w-full p-1'>
+                            <Text fontSize="sm" fontWeight="thin" color="gray.600">
+                                <Text fontSize="xs" fontWeight="thin" color="gray.600">
+                                    <Code fontWeight="bold" colorScheme='blackAlpha'>Esc</Code> para cerrar ventana
+                                </Text>
+                            </Text>
+                        </div>
+                    </Box>
+                </Modal>
+            }
         </div>
     );
 };

@@ -99,3 +99,37 @@ export const createProvider = async ({
         return response
     }
 }
+
+export const upProvider = async ({
+    provider,
+    billing,
+    id
+}) => {
+    console.log("🚀 ~ billing:", billing)
+    console.log("🚀 ~ provider:", provider)
+    let response = { status: false }
+    
+    try {
+        let fetch = await Fetcher({
+            method: 'PATCH',
+            url: `/provider/${id}`,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                provider,
+                billing
+            })
+        });
+
+        console.log("🚀 ~ fetch:", fetch)
+
+        if (fetch.status == 201) {
+            response = { status: true, data: fetch?.data };
+        }
+    } catch (error) {
+        console.log("🚀 ~ error:", error)
+    } finally {
+        return response
+    }
+}

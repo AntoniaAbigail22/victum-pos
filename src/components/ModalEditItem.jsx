@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, Input, Grid, GridItem, Box, Text, Code, Tabs, TabList, TabPanels, Tab, TabPanel
+    Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, Input, Grid, GridItem, Box, Text, Code, Tabs, TabList, TabPanels, Tab, TabPanel, FormErrorMessage, FormHelperText,
 } from '@chakra-ui/react'
 
 const ModalEditItem = ({
@@ -15,7 +15,10 @@ const ModalEditItem = ({
     formData02,
     setFormData02,
     addProvider,
+    updateProvider
 }) => {
+
+
 
     useEffect(() => {
         if (provider) {
@@ -93,11 +96,58 @@ const ModalEditItem = ({
         setFormData02((prev) => ({ ...prev, [name]: value }));
     };
 
+    const [validEmail, setValidEmail] = useState(false)
+
+    const [errors, setErrors] = useState({
+        name: false,
+        last_name: false,
+        phone: false,
+        email: false,
+        company: false,
+        rfc: false,
+        curp: false,
+        id_asiggned_me: false,
+        comment: false,
+    });
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        setFormData01((prev) => ({ ...prev, ['store_id']: 1 }));
-        setFormData02((prev) => ({ ...prev, ['store_id']: 1 }));
-        addProvider()
+        const keys = Object.keys(errors);
+        const errorsAux = {};
+
+        if (!formData01) {
+            const newErrors = keys.reduce((acc, key) => {
+                acc[key] = true;
+                return acc;
+            }, {});
+            setErrors(newErrors);
+            return;
+        }
+
+        const newErrors = keys.reduce((acc, key) => {
+            acc[key] = !formData01[key];
+            return acc;
+        }, {});
+        setErrors(newErrors);
+
+        console.log("🚀 ~ handleSubmit ~ errorsAux:", newErrors);
+
+        const emailRegex = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
+        const isValidEmail = emailRegex.test(formData01?.email);
+        setValidEmail(!isValidEmail);
+
+        if (!isValidEmail) return;
+
+        if (Object.values(newErrors).some(Boolean)) return;
+
+        setFormData01((prev) => ({ ...prev, store_id: 1 }));
+        setFormData02((prev) => ({ ...prev, store_id: 1 }));
+
+        if (selectedProvider) {
+            updateProvider()
+        } else {
+            addProvider();
+        }
     };
 
     const closeModal = () => {
@@ -111,7 +161,7 @@ const ModalEditItem = ({
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader bg="blue.500" color="white" position="relative">
-                    {selectedProvider ? "Editar Proveedor" : "Crear Proveedor"}
+                    {selectedProvider ? "Editar" : "Crear"} Proveedor
                 </ModalHeader>
                 <ModalCloseButton
                     color="white"
@@ -137,6 +187,11 @@ const ModalEditItem = ({
                                                     onChange={handleChange}
                                                     placeholder="Compañía"
                                                 />
+                                                {errors?.company &&
+                                                    <FormHelperText color={'red.500'}>
+                                                        Nombre de la empresa requerida
+                                                    </FormHelperText>
+                                                }
                                             </FormControl>
                                         </GridItem>
                                         <GridItem>
@@ -148,6 +203,11 @@ const ModalEditItem = ({
                                                     onChange={handleChange}
                                                     placeholder="ID Asignado"
                                                 />
+                                                {errors?.id_asiggned_me &&
+                                                    <FormHelperText color={'red.500'}>
+                                                        ID asignado es requerido
+                                                    </FormHelperText>
+                                                }
                                             </FormControl>
                                         </GridItem>
                                         <GridItem>
@@ -159,6 +219,11 @@ const ModalEditItem = ({
                                                     onChange={handleChange}
                                                     placeholder="Apellidos"
                                                 />
+                                                {errors?.name &&
+                                                    <FormHelperText color={'red.500'}>
+                                                        Nombre requerido
+                                                    </FormHelperText>
+                                                }
                                             </FormControl>
                                         </GridItem>
                                         <GridItem colSpan={1}>
@@ -170,6 +235,11 @@ const ModalEditItem = ({
                                                     onChange={handleChange}
                                                     placeholder="Apellidos"
                                                 />
+                                                {errors?.last_name &&
+                                                    <FormHelperText color={'red.500'}>
+                                                        Apellidos requeridos
+                                                    </FormHelperText>
+                                                }
                                             </FormControl>
                                         </GridItem>
 
@@ -182,7 +252,13 @@ const ModalEditItem = ({
                                                     value={formData01?.rfc}
                                                     onChange={handleChange}
                                                     placeholder="RFC"
+                                                    maxLength={13}
                                                 />
+                                                {errors?.rfc &&
+                                                    <FormHelperText color={'red.500'}>
+                                                        RFC requerido
+                                                    </FormHelperText>
+                                                }
                                             </FormControl>
                                         </GridItem>
                                         <GridItem colSpan={1}>
@@ -193,7 +269,13 @@ const ModalEditItem = ({
                                                     value={formData01?.curp}
                                                     onChange={handleChange}
                                                     placeholder="CURP"
+                                                    maxLength={20}
                                                 />
+                                                {errors?.curp &&
+                                                    <FormHelperText color={'red.500'}>
+                                                        CURP requerida
+                                                    </FormHelperText>
+                                                }
                                             </FormControl>
                                         </GridItem>
 
@@ -205,7 +287,13 @@ const ModalEditItem = ({
                                                     value={formData01?.phone}
                                                     onChange={handleChange}
                                                     placeholder="Teléfono"
+                                                    type='number'
                                                 />
+                                                {errors?.phone &&
+                                                    <FormHelperText color={'red.500'}>
+                                                        Número telefónico requerido
+                                                    </FormHelperText>
+                                                }
                                             </FormControl>
                                         </GridItem>
                                         <GridItem colSpan={1}>
@@ -216,24 +304,22 @@ const ModalEditItem = ({
                                                     value={formData01?.email}
                                                     onChange={handleChange}
                                                     placeholder="Email"
+                                                    type="email"
                                                 />
+                                                {errors?.email ?
+                                                    <FormHelperText color={'red.500'}>
+                                                        Correo electrónico requerido
+                                                    </FormHelperText>
+                                                    : validEmail &&
+                                                    <FormHelperText color={'red.500'}>
+                                                        Correo electrónico inválido
+                                                    </FormHelperText>
+
+                                                }
                                             </FormControl>
                                         </GridItem>
 
-                                        {provider?.id &&
-                                            <GridItem>
-                                                <FormControl>
-                                                    <FormLabel>Fecha de Registro</FormLabel>
-                                                    <Input
-                                                        name="created_at"
-                                                        //type="date"
-                                                        disabled
-                                                        value={formData01?.created_at}
-                                                        onChange={handleChange}
-                                                    />
-                                                </FormControl>
-                                            </GridItem>
-                                        }
+
                                         <GridItem colSpan={2}>
                                             <FormControl>
                                                 <FormLabel>Comentarios</FormLabel>
@@ -242,8 +328,18 @@ const ModalEditItem = ({
                                                     value={formData01?.comment}
                                                     onChange={handleChange}
                                                 />
+                                                {errors?.comment &&
+                                                    <FormHelperText color={'red.500'}>
+                                                        Comentario requerido
+                                                    </FormHelperText>
+                                                }
                                             </FormControl>
                                         </GridItem>
+                                        {provider?.id &&
+                                            <GridItem>
+                                                <FormLabel className='italic font-bold' color={'gray.400'}>Fecha de Registro: {formData01?.created_at}</FormLabel>
+                                            </GridItem>
+                                        }
 
                                     </Grid>
                                 </TabPanel>
@@ -256,7 +352,7 @@ const ModalEditItem = ({
                                                     name="company"
                                                     value={formData02?.company}
                                                     onChange={handleChange2}
-                                                    placeholder="Compañía"
+                                                    placeholder="Razón Social"
                                                 />
                                             </FormControl>
                                         </GridItem>
@@ -292,7 +388,6 @@ const ModalEditItem = ({
                                                     name="address"
                                                     value={formData02?.address}
                                                     onChange={handleChange2}
-                                                    placeholder="Teléfono"
                                                 />
                                             </FormControl>
                                         </GridItem>
@@ -303,7 +398,6 @@ const ModalEditItem = ({
                                                     name="no_e"
                                                     value={formData02?.no_e}
                                                     onChange={handleChange2}
-                                                    placeholder="Email"
                                                 />
                                             </FormControl>
                                         </GridItem>
@@ -314,7 +408,6 @@ const ModalEditItem = ({
                                                     name="no_i"
                                                     value={formData02?.no_i}
                                                     onChange={handleChange2}
-                                                    placeholder="ID Asignado"
                                                 />
                                             </FormControl>
                                         </GridItem>
