@@ -135,14 +135,14 @@ const TableList = ({
 
     const CustomEmpty = () => (
         <Empty
-          image={'https://img.icons8.com/fluency/96/000000/nothing-found.png'}
-          description="No hay datos disponibles"
-          imageStyle={{ height: 100, justifyContent: 'center', display: 'flex' }}
-          className='h-[250px] flex flex-col justify-center align-middle'
+            image={'https://img.icons8.com/fluency/96/000000/nothing-found.png'}
+            description="No hay datos disponibles"
+            imageStyle={{ height: 100, justifyContent: 'center', display: 'flex' }}
+            className='h-[250px] flex flex-col justify-center align-middle'
         >
-          <Button type="primary" onClick={handleNew}>Agregar datos</Button>
+            <Button type="primary" onClick={handleNew}>Agregar datos</Button>
         </Empty>
-      );
+    );
 
     return (
         <div ref={tableRef} className='w-full min-h-[200px] flex flex-col'>
@@ -197,10 +197,11 @@ const TableList = ({
                     bordered
                     size="small"
                     pagination={{
+                        position: ['bottomLeft'],
                         current: current,
                         pageSize: 10,
                         total: total,
-                        showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} elementos`,
+                        //showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} elementos`,
                     }}
                     onChange={handleTableChange}
                     onRow={(record) => ({
@@ -212,7 +213,7 @@ const TableList = ({
                     }
                     locale={{
                         emptyText: <CustomEmpty />
-                      }}
+                    }}
                 />
             }
             <div className='fixed bottom-0 left-0 bg-slate-100 w-full p-1'>
