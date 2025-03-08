@@ -58,7 +58,7 @@ const ProvidersPage = () => {
 
     const addProvider = async () => {
         try {
-            const response = await createProvider({ provider: formData01, billing: formData02 })
+            const response = await createProvider({ provider: formData01, billing: formData02, store_id: store  })
             if (response?.status) {
                 sendNotification('success', `Se agrego al proveedor ${response?.data?.provider?.name} ${response?.data?.provider?.last_name} con éxito`)
                 onClose()
@@ -74,7 +74,7 @@ const ProvidersPage = () => {
 
     const updateProvider = async () => {
         try {
-            const response = await upProvider({ provider: formData01, billing: formData02, id: selectedProvider || provider?.id })
+            const response = await upProvider({ provider: formData01, billing: formData02, id: selectedProvider || provider?.id, store_id: store })
             if (response?.status) {
                 sendNotification('success', `Se actualizó al proveedor ${provider?.name} ${provider?.last_name} con éxito`)
                 onClose()

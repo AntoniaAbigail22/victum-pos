@@ -91,7 +91,6 @@ const ModalEditItem = ({
         rfc: false,
         curp: false,
         id_asiggned_me: false,
-        comment: false,
     });
 
     const handleSubmit = (e) => {
@@ -124,14 +123,11 @@ const ModalEditItem = ({
 
         if (Object.values(newErrors).some(Boolean)) return;
 
-        setFormData01((prev) => ({ ...prev, store_id: 1 }));
-        setFormData02((prev) => ({ ...prev, store_id: 1 }));
+        /*setFormData01((prev) => ({ ...prev, store_id: 1 }));
+        setFormData02((prev) => ({ ...prev, store_id: 1 }));*/
 
-        if (selectedProvider) {
-            updateProvider()
-        } else {
-            addProvider();
-        }
+        if (selectedProvider) updateProvider()
+        else addProvider();
     };
 
     const closeModal = () => {
@@ -306,17 +302,12 @@ const ModalEditItem = ({
 
                                         <GridItem colSpan={2}>
                                             <FormControl>
-                                                <FormLabel>Comentarios<span className='text-red-500'>*</span></FormLabel>
+                                                <FormLabel>Comentarios</FormLabel>
                                                 <Input
                                                     name="comment"
                                                     value={formData01?.comment}
                                                     onChange={handleChange}
                                                 />
-                                                {errors?.comment &&
-                                                    <FormHelperText color={'red.500'}>
-                                                        Comentario requerido
-                                                    </FormHelperText>
-                                                }
                                             </FormControl>
                                         </GridItem>
                                         {provider?.id &&

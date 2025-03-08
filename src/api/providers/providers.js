@@ -69,7 +69,8 @@ export const deleteProvider = async ({ id }) => {
 
 export const createProvider = async ({
     provider,
-    billing
+    billing,
+    store_id
 }) => {
     console.log("🚀 ~ billing:", billing)
     console.log("🚀 ~ provider:", provider)
@@ -78,7 +79,7 @@ export const createProvider = async ({
     try {
         let fetch = await Fetcher({
             method: 'POST',
-            url: `/provider`,
+            url: `/provider/${store_id}`,
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -103,7 +104,8 @@ export const createProvider = async ({
 export const upProvider = async ({
     provider,
     billing,
-    id
+    id,
+    store_id
 }) => {
     console.log("🚀 ~ billing:", billing)
     console.log("🚀 ~ provider:", provider)
@@ -112,7 +114,7 @@ export const upProvider = async ({
     try {
         let fetch = await Fetcher({
             method: 'PATCH',
-            url: `/provider/${id}`,
+            url: `/provider/${id}?store_id=${store_id}`,
             headers: {
                 'Content-Type': 'application/json'
             },

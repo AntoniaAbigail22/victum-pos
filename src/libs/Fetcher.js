@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const axiosAPIInstance = axios.create({ 
-    baseURL: 'https://melody-back-sigma.vercel.app/api',
-    //baseURL: "http://localhost:3000/api",
+    //baseURL: 'https://melody-back-sigma.vercel.app/api',
+    baseURL: "http://localhost:3000/api",
     headers: { 
         "Accept": "application/json", 
         "Content-Type": "application/json; charset=utf-8;"
