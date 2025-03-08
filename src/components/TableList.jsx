@@ -64,6 +64,9 @@ const TableList = ({
 
     const handleNew = () => {
         console.log('Nuevo');
+        setSelectedRowKey(null);
+        setSelectedProvider(null)
+        setProvider(null);
         onOpen()
     };
 
