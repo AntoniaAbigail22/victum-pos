@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, FormControl, FormLabel, Input, Grid, GridItem, Box, Text, Code, Tabs, TabList, TabPanels, Tab, TabPanel, FormErrorMessage, FormHelperText,
+    Button, Modal,
+    ModalOverlay, ModalContent,
+    ModalHeader, ModalFooter,
+    ModalBody, ModalCloseButton,
+    FormControl, FormLabel, Input,
+    Grid, GridItem, Box, Code,
+    Tabs, TabList, TabPanels, Tab,
+    TabPanel,
+    FormHelperText,
 } from '@chakra-ui/react'
+import { notification } from 'antd';
+import { openNotification } from '../libs/Extras';
+import BottomMessage from './BottomMessage';
 
 const ModalEditItem = ({
     isOpen,
@@ -17,6 +28,9 @@ const ModalEditItem = ({
     addProvider,
     updateProvider
 }) => {
+
+    const [api, contextHolder] = notification.useNotification();
+    const sendNotification = (type, description) => openNotification(api, type, description)
 
     useEffect(() => {
         if (provider) {
@@ -69,6 +83,9 @@ const ModalEditItem = ({
         } else if (event.key === 'ArrowRight') {
             setTabIndex((prevIndex) => (prevIndex < 1 ? prevIndex + 1 : prevIndex));
         }
+        if (event.key === "F10" || (event.key === "F10" && event.ctrlKey)) {
+            handleSubmit(event);
+        }
     };
 
     const handleChange = (e) => {
@@ -89,7 +106,6 @@ const ModalEditItem = ({
         email: false,
         company: false,
         rfc: false,
-        curp: false,
         id_asiggned_me: false,
     });
 
@@ -104,6 +120,7 @@ const ModalEditItem = ({
                 return acc;
             }, {});
             setErrors(newErrors);
+            sendNotification("info", "Verifica el")
             return;
         }
 
@@ -119,12 +136,15 @@ const ModalEditItem = ({
         const isValidEmail = emailRegex.test(formData01?.email);
         setValidEmail(!isValidEmail);
 
-        if (!isValidEmail) return;
+        if (!isValidEmail) {
+            sendNotification("info", "Verifica el correo electronico")
+            return
+        }
 
-        if (Object.values(newErrors).some(Boolean)) return;
-
-        /*setFormData01((prev) => ({ ...prev, store_id: 1 }));
-        setFormData02((prev) => ({ ...prev, store_id: 1 }));*/
+        if (Object.values(newErrors).some(Boolean)) {
+            sendNotification("info", "Verifica los campos reuqeridos")
+            return
+        }
 
         if (selectedProvider) updateProvider()
         else addProvider();
@@ -243,7 +263,7 @@ const ModalEditItem = ({
                                         </GridItem>
                                         <GridItem colSpan={1}>
                                             <FormControl>
-                                                <FormLabel>CURP<span className='text-red-500'>*</span></FormLabel>
+                                                <FormLabel>CURP</FormLabel>
                                                 <Input
                                                     name="curp"
                                                     value={formData01?.curp}
@@ -331,8 +351,6 @@ const ModalEditItem = ({
                                                 />
                                             </FormControl>
                                         </GridItem>
-
-
                                         <GridItem colSpan={2}>
                                             <FormControl>
                                                 <FormLabel>RFC</FormLabel>
@@ -456,41 +474,19 @@ const ModalEditItem = ({
                 </ModalBody>
 
                 <ModalFooter bg="white">
-                    <Button
-                        onClick={closeModal}
-                        _focus={{
-                            boxShadow: "outline",
-                        }}
-                    >
-                        Cancelar
+                    <Button onClick={closeModal}>
+                        Cancelar (Esc)
                     </Button>
                     <Button
                         colorScheme="blue"
                         ml={3}
-                        onClick={handleSubmit}
-                        onKeyDown={(e) => {
-                            if (e.key === " ") {
-                                e.preventDefault();
-                                handleSubmit(e);
-                            }
-                        }}>
-                        Guardar
+                        onClick={handleSubmit}>
+                        Guardar (F10)
                     </Button>
-
-                    {/*<Text fontSize="sm" color="gray.500">
-                            <strong>Esc</strong> = Cerrar ventana
-                        </Text>*/}
-
-                    <Box mt={2} width="full" position={'absolute'} left={10}>
-                        <div className='fixed bottom-0 left-0 bg-slate-200 w-full p-1'>
-                            <Text fontSize="sm" fontWeight="thin" color="gray.600">
-                                <Text fontSize="xs" fontWeight="thin" color="gray.600">
-                                    <Code fontWeight="bold" colorScheme='blackAlpha'>Esc</Code> para cerrar ventana,{" "}
-                                    <Code fontWeight="bold" colorScheme='blackAlpha'>→</Code> o <Code fontWeight="bold" colorScheme='blackAlpha'>←</Code> para navegar entre las opciones{" "}
-                                </Text>
-                            </Text>
-                        </div>
-                    </Box>
+                    <BottomMessage>
+                        <Code fontWeight="bold" colorScheme='blackAlpha'>Tab → </Code> para cambiar entre campo de texto,{" "}
+                        <Code fontWeight="bold" colorScheme='blackAlpha'>→</Code> o <Code fontWeight="bold" colorScheme='blackAlpha'>←</Code> para navegar entre las opciones.
+                    </BottomMessage>
                 </ModalFooter>
             </ModalContent>
         </Modal >

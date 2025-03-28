@@ -2,15 +2,19 @@ import { createRoot } from 'react-dom/client';
 import { ChakraProvider } from '@chakra-ui/react';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import { CustomProvider } from 'rsuite';
+import 'rsuite/styles/index.less';
 
 const container = document.getElementById('root');
 
 if (container) {
-  const root = createRoot(container); 
+  const root = createRoot(container);
   root.render(
     <ChakraProvider>
       <BrowserRouter>
-        <App/>
+        <CustomProvider theme='high'>
+          <App />
+        </CustomProvider>
       </BrowserRouter>
     </ChakraProvider>
   );

@@ -1,36 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Table, Spin, Button, Input, Empty } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
-import { Text, Code } from '@chakra-ui/react';
-
-//import type { TableProps } from 'antd';
-/*interface TableListProps {
-    columns: TableProps<any>['columns'];
-    data: any[];
-    loading: boolean;
-    newItem: boolean;
-    searchItem: any;
-    changePage: any;
-    search: string;
-    current: number;
-    total: number;
-    selectedProvider: any;
-    setSelectedProvider: any;
-    onOpen: any;
-    setProvider: any;
-    isOpen: boolean;
-    deleteItem: any;
-}
-
-interface DataType {
-    id: string;
-    company: string;
-    phone: number;
-}*/
+import { Table, Spin, Button, Input, Empty, Drawer } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import { Code, FormControl, FormLabel, Box } from '@chakra-ui/react'
+import { Radio, RadioGroup, Stack } from "@chakra-ui/react";
+import BottomMessage from './BottomMessage';
+import CustomEmpty from './CustomEmpty';
 
 const TableList = ({
     columns,
     data,
+    label,
     loading,
     newItem,
     searchItem,
@@ -44,6 +23,10 @@ const TableList = ({
     setProvider,
     isOpen,
     deleteItem,
+    openFilter,
+    setOpenFilter,
+    isChecked,
+    setIsChecked,
 }) => {
 
     const [selectedRowKey, setSelectedRowKey] = useState(null);
@@ -56,12 +39,9 @@ const TableList = ({
 
     const handleSearch = (value) => {
         searchItem(value);
-
         if (value === "") setSelectedRowKey(null);
         else setSelectedRowKey(data[0].id);
-        //if (data.length > 0) 
     };
-
     const handleNew = () => {
         console.log('Nuevo');
         setSelectedRowKey(null);
@@ -78,18 +58,14 @@ const TableList = ({
             setProvider(item);
             console.log("🚀 ~ handleEdit ~ item:", item)
             onOpen()
-        } else {
-            console.log('Selecciona una fila para editar');
-        }
+        } else console.log('Selecciona una fila para editar');
     };
 
     const handleDelete = () => {
         if (selectedRowKey) {
             console.log('Eliminar:', selectedRowKey);
             deleteItem(selectedRowKey)
-        } else {
-            console.log('Selecciona una fila para eliminar');
-        }
+        } else console.log('Selecciona una fila para eliminar');
     };
 
     useEffect(() => {
@@ -104,47 +80,33 @@ const TableList = ({
 
         if (event.key === 'ArrowDown') {
             const nextIndex = currentIndex + 1;
-            if (nextIndex < data.length) {
-                setSelectedRowKey(data[nextIndex].id);
-            }
+            if (nextIndex < data.length) setSelectedRowKey(data[nextIndex].id);
         } else if (event.key === 'ArrowUp') {
             const prevIndex = currentIndex - 1;
-            if (prevIndex >= 0) {
-                setSelectedRowKey(data[prevIndex].id);
-            }
+            if (prevIndex >= 0) setSelectedRowKey(data[prevIndex].id);
         }
         if (event.key === 'Enter') {
             event.preventDefault();
             if (selectedRowKey) {
                 console.log("🚀 🚀🚀🚀🚀 :", isOpen)
-                if (isOpen == false && data.length > 0) {
-                    handleEdit();
-                    console.log("🚀 ~ handleKeyDown ~ selectedRowKey && isOpen:", selectedRowKey, isOpen)
-                }
+                if (isOpen == false && data.length > 0) handleEdit();
             }
         } else if (event.key === 'Delete' || event.key === 'Backspace') {
-            if (selectedRowKey && selectedProvider) {
-                handleDelete();
-            }
-        } else if (event.key == "Escape") {
-            setSelectedRowKey(null)
-        }
+            if (selectedRowKey && selectedProvider) handleDelete();
+        } else if (event.key == "Escape") setSelectedRowKey(null)
     };
 
     const handleTableChange = (pagination) => {
         if (pagination.current !== undefined) changePage(pagination.current);
     };
 
-    const CustomEmpty = () => (
-        <Empty
-            image={'https://img.icons8.com/fluency/96/000000/nothing-found.png'}
-            description="No hay datos disponibles"
-            imageStyle={{ height: 100, justifyContent: 'center', display: 'flex' }}
-            className='h-[250px] flex flex-col justify-center align-middle'
-        >
-            <Button type="primary" onClick={handleNew}>Agregar datos</Button>
-        </Empty>
-    );
+    const handleSubmitFilter = () => onClose();
+    const onClose = () => setOpenFilter(false);
+
+    const handleCheckboxChange = (e) => {
+        setIsChecked(e);
+        setSelectedRowKey(null)
+    };
 
     return (
         <div ref={tableRef} className='w-full min-h-[200px] flex flex-col'>
@@ -163,7 +125,7 @@ const TableList = ({
                         icon={<EditOutlined />}
                         onClick={handleEdit}
                         disabled={!selectedRowKey}
-                        tabIndex={0}
+                        tabIndex={2}
                     >
                         Editar
                     </Button>
@@ -172,7 +134,13 @@ const TableList = ({
                         icon={<DeleteOutlined />}
                         onClick={handleDelete}
                         disabled={!selectedRowKey}
-                        tabIndex={0}
+                        tabIndex={3}
+                    />
+                    <Button
+                        type='default'
+                        icon={<FilterOutlined />}
+                        onClick={setOpenFilter}
+                        tabIndex={4}
                     />
                 </div>
             </div>
@@ -189,10 +157,7 @@ const TableList = ({
                 </Button>
             }
 
-            {loading ?
-                <div className='flex w-full h-[80vh] items-center justify-center'>
-                    <Spin size="large" />
-                </div>
+            {loading ? <Spin size="large" fullscreen tip={`Cargando...`}/>
                 : <Table
                     columns={columns}
                     dataSource={data}
@@ -215,25 +180,43 @@ const TableList = ({
                     rowClassName={(record) =>
                         record.id === selectedRowKey ? 'bg-blue-100' : ''
                     }
-                    locale={{
-                        emptyText: <CustomEmpty />
-                    }}
+                    locale={{ emptyText: <CustomEmpty onAddNew={handleNew} /> }}
                 />
             }
-            <div className='fixed bottom-0 left-0 bg-slate-100 w-full p-1'>
-                <Text fontSize="sm" fontWeight="thin" color="gray.600">
-                    <Text fontSize="xs" fontWeight="thin" color="gray.600">
-                        {!selectedRowKey ? "Selecciona un elemento para ver las opciones disponibles" :
-                            <>
-                                <Code fontWeight="bold" colorScheme='blackAlpha'>↓</Code> para navegar hacia abajo,{" "}
-                                <Code fontWeight="bold" colorScheme='blackAlpha'>↑</Code> para navegar hacia arriba,{" "}
-                                <Code fontWeight="bold" colorScheme='blackAlpha'>Supr/Delete</Code> para eliminar,{" "}
-                                <Code fontWeight="bold" colorScheme='blackAlpha'>Enter</Code> o <Code fontWeight="bold" colorScheme='blackAlpha'>Doble Click</Code> para modificar
-                            </>
-                        }
-                    </Text>
-                </Text>
-            </div>
+            <BottomMessage>
+                {!selectedRowKey ? "Selecciona un elemento para ver las opciones disponibles" :
+                    <>
+                        <Code fontWeight="bold" colorScheme='blackAlpha'>↓</Code> para navegar hacia abajo,{" "}
+                        <Code fontWeight="bold" colorScheme='blackAlpha'>↑</Code> para navegar hacia arriba,{" "}
+                        <Code fontWeight="bold" colorScheme='blackAlpha'>Supr/Delete</Code> para eliminar,{" "}
+                        <Code fontWeight="bold" colorScheme='blackAlpha'>Enter</Code> o <Code fontWeight="bold" colorScheme='blackAlpha'>Doble Click</Code> para modificar
+                    </>
+                }
+            </BottomMessage>
+            <Drawer title="Búsqueda avanzada" onClose={onClose} open={openFilter}>
+                <Box as="form" className='flex flex-col h-[calc(100vh-105px)] justify-between' onSubmit={handleSubmitFilter}>
+                    <div className='flex flex-col gap-4'>
+                        <FormControl>
+                            <FormLabel>Nombre</FormLabel>
+                            <Input
+                                name="company"
+                                value={search}
+                                onChange={(e) => handleSearch(e.target.value)}
+                                placeholder="Representante o compañia"
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel>{label} archivados</FormLabel>
+                            <RadioGroup value={isChecked} onChange={handleCheckboxChange}>
+                                <Stack direction='column'>
+                                    <Radio value="false">Activos</Radio>
+                                    <Radio value="true">Archivados</Radio>
+                                </Stack>
+                            </RadioGroup>
+                        </FormControl>
+                    </div>
+                </Box>
+            </Drawer>
         </div>
     );
 };

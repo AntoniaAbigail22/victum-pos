@@ -8,9 +8,12 @@ import Configuracion from './pages/Configuracion';
 import CorteCaja from './pages/CorteCaja';
 import './App.css'
 import DirectoryMenu from './components/DirectoryMenu';
+import DirectoryInventory from './components/DirectoryInventory'
 import ProvidersPage from './pages/ProvidersPage';
+import InventoryPage from './pages/InventoryPage';
 
 const directory = 'directory'
+const inventory = 'inventory'
 const sales = 'sales'
 
 const App = () => {
@@ -19,11 +22,13 @@ const App = () => {
             <Route path="/" element={<LayoutComponent />}>
                 <Route index element={<Ventas />} />
                 <Route path={`/${sales}`} element={<Ventas />} />
-                <Route path="inventario" element={<Inventario />} />
 
                 <Route path="configuracion" element={<Configuracion />} />
                 <Route path="corte" element={<CorteCaja />} />
                 <Route path="*" element={<h2>Página no encontrada</h2>} />
+
+                <Route path={`/${inventory}`} element={<DirectoryInventory />} />
+                <Route path={`/${directory}/:inventory_id`} element={<InventoryPage />} />
 
                 <Route path={`/${directory}`} element={<DirectoryMenu />} />
                 <Route path={`/${directory}/employees`} element={<ProvidersPage />} />

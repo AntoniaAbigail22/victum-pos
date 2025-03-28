@@ -2,6 +2,8 @@ import { Box, Breadcrumb, BreadcrumbItem, BreadcrumbLink, Code, Text } from '@ch
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { ChevronRightIcon } from '@chakra-ui/icons'
+import BottomMessage from './BottomMessage';
+import { indexWarehouses } from '../api/products/products';
 
 const options = [
     {
@@ -34,8 +36,29 @@ const DirectoryMenu = () => {
 
     const [selectedRowKey, setSelectedRowKey] = useState(null);
     const tableRef = useRef(null);
-
     const navigate = useNavigate();
+
+    const store = 1;
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        getWarehouses();
+    }, []);
+
+    const getWarehouses = async () => {
+        try {
+            const response = await indexWarehouses({ store })
+            if (response?.status) {
+                setData(response?.data?.data)
+            }
+            console.log("🚀 ~ getWarehouses ~ response:", response)
+        } catch (error) {
+            console.log("🚀 ~ getProviders ~ error:", error)
+        } finally {
+            setLoading(true);
+        }
+    };
 
     useEffect(() => {
         if (selectedRowKey && tableRef.current) {
@@ -55,10 +78,10 @@ const DirectoryMenu = () => {
 
     const handleKeyDown = (event) => {
         if (!tableRef.current) return;
-    
+
         const currentIndex = options.findIndex((item) => item?.url === selectedRowKey);
         const columns = 3;
-    
+
         if (event.key === 'ArrowDown' || event.key === 'Tab') {
             event.preventDefault();
             const nextIndex = currentIndex + columns;
@@ -102,51 +125,36 @@ const DirectoryMenu = () => {
                     </BreadcrumbItem>
                 </Breadcrumb>
             </Box>
-            <div className="flex justify-center items-center h-[85vh]">
-                <div ref={tableRef} className="grid sm:grid-cols-1 grid-cols-1 md:grid-cols-3 gap-6 p-6 max-w-4xl w-full">
-                    {options.map((option, index) => (
-                        <NavLink
-                            key={`directory-${option?.url}-${index}`}
-                            to={`/directory/${option?.url}`}
-                            data-url={option.url}
-                            className={({ isActive }) =>
-                                `block 
-                                bg-white 
-                                md:p-6 
-                                p-3
-                                rounded-lg 
-                                shadow-md text-center
-                                hover:shadow-lg transition-shadow duration-300 
-                                ${isActive || selectedRowKey === option.url 
-                                    //? 'bg-blue-500 text-white' 
-                                    ? 'bg-blue-500 border-2 border-blue-700'
-                                    : 'text-gray-700 hover:bg-gray-200'}`
-                            }
-                        >
-                            <img
-                                src={option.image}
-                                alt={option.title}
-                                className="w-24 h-24 mx-auto mb-4"
-                                loading="lazy"
-                            />
-                            <h3 className="text-xl font-semibold mb-2">{option.title}</h3>
-                            <p className="text-gray-600">{option.description}</p>
-                        </NavLink>
-                    ))}
-                </div>
-                {/*<div className="flex-1 p-6">
-                <Outlet />
-            </div>*/}
-                <Box mt={2} width="full" position={'absolute'} left={10}>
-                    <div className='fixed bottom-0 left-0 bg-slate-200 w-full p-1'>
-                            <Text fontSize="xs" fontWeight="thin" color="gray.600">
-                                <Code fontWeight="bold" colorScheme='blackAlpha'>TAB ↓ ↑ → ←</Code>, para navegar entre las opciones, {" "}
-                                <Code fontWeight="bold" colorScheme='blackAlpha'>Enter</Code> para seleccionar
-                            </Text>
+            {loading &&
+                <div className="flex justify-center items-center h-[85vh]">
+                    <div ref={tableRef} className="grid sm:grid-cols-1 grid-cols-1 md:grid-cols-3 gap-6 p-6 max-w-4xl w-full">
+                        {data.map((option, index) => (
+                            <NavLink
+                                key={`directory-${option?.url}-${index}`}
+                                to={`/directory/${option?.url}`}
+                                //data-url={option.url}
+                                className={({ isActive }) =>
+                                    `block bg-white md:p-6 p-3 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow duration-300 
+                                    ${isActive || selectedRowKey === option.url ? 'bg-blue-500 border-2 border-blue-700' : 'text-gray-700 hover:bg-gray-200'}`
+                                }
+                            >
+                                <img
+                                    src={option?.image}
+                                    alt={option?.title}
+                                    className="w-24 h-24 mx-auto mb-4"
+                                    loading="lazy"
+                                />
+                                <h3 className="text-xl font-semibold mb-2">{option?.title}</h3>
+                                <p className="text-gray-600">{option?.description}</p>
+                            </NavLink>
+                        ))}
                     </div>
-                </Box>
-
-            </div>
+                    <BottomMessage>
+                        <Code fontWeight="bold" colorScheme='blackAlpha'>TAB ↓ ↑ → ←</Code>, para navegar entre las opciones, {" "}
+                        <Code fontWeight="bold" colorScheme='blackAlpha'>Enter</Code> para seleccionar
+                    </BottomMessage>
+                </div>
+            }
         </div>
     )
 };

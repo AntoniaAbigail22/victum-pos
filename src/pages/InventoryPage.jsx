@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Space, notification } from 'antd';
 import { ExclamationCircleFilled, EditOutlined, DeleteOutlined, InboxOutlined, PhoneOutlined, MailOutlined } from '@ant-design/icons';
-import { Code, useDisclosure } from "@chakra-ui/react";
+import { Code, Text, useDisclosure } from "@chakra-ui/react";
 import TableList from '../components/TableList';
 import ModalEditItem from '../components/ModalEditItem';
 import { openNotification } from '../libs/Extras';
@@ -9,11 +9,26 @@ import { indexProviders, getBillingByProvider, deleteProvider, createProvider, u
 import BreadcrumbHeader from '../components/BreadcrumbHeader';
 import BottomMessage from '../components/BottomMessage';
 
-const ProvidersPage = () => {
+import { Table, IconButton, Input, DatePicker, InputNumber } from 'rsuite';
+import { VscEdit, VscSave, VscRemove } from 'react-icons/vsc';
+import { indexProducts } from '../api/products/products';
+
+const { Column, HeaderCell, Cell } = Table;
+
+const styles = `
+    .table-cell-editing .rs-table-cell-content {
+    padding: 4px;
+    }
+    .table-cell-editing .rs-input {
+    width: 100%;
+    }
+`;
+
+const InventoryPage = () => {
 
     const [api, contextHolder] = notification.useNotification();
     const sendNotification = (type, description) => openNotification(api, type, description)
-    
+
     const store = 1;
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
@@ -42,7 +57,7 @@ const ProvidersPage = () => {
 
     const getProviders = async () => {
         try {
-            const response = await indexProviders({ store, page, search, isChecked })
+            const response = await indexProducts({ store, page, search })
             if (response?.status) {
                 setData(response?.data?.data)
                 setTotal(response?.data?.total)
@@ -143,14 +158,10 @@ const ProvidersPage = () => {
         window.location.href = `tel:${phone}`;
     };
 
-    const label = 'Proveedores';
+    const label = 'Inventario';
     const links = [
         {
-            href: '/directory',
-            label: 'Directorio'
-        },
-        {
-            label: label
+            label: 'Inventario'
         }
     ]
 
@@ -181,7 +192,7 @@ const ProvidersPage = () => {
             render: ({ phone, email }) => (
                 <span>
                     <span>
-                        {phone} <Button color="primary" variant="outlined" icon={<PhoneOutlined />} size={'small'} onClick={() => handlePhoneClick(phone)}/>
+                        {phone} <Button color="primary" variant="outlined" icon={<PhoneOutlined />} size={'small'} onClick={() => handlePhoneClick(phone)} />
                     </span> <br />
                     <span>
                         {email} {/*<Button color="primary" variant="outlined" icon={<MailOutlined />} size={'small'} onClick={() => handleEmailClick(email)}/>*/}
@@ -220,81 +231,148 @@ const ProvidersPage = () => {
         },
     ];
 
+    //const [data, setData] = React.useState(defaultData);
+
+    const handleChange = (id, key, value) => {
+        const nextData = Object.assign([], data);
+        nextData.find(item => item.id === id)[key] = value;
+        setData(nextData);
+    };
+    const handleEdit = id => {
+        const nextData = Object.assign([], data);
+        const activeItem = nextData.find(item => item.id === id);
+
+        activeItem.status = activeItem.status ? null : 'EDIT';
+
+        setData(nextData);
+    };
+
+    const handleRemove = id => {
+        setData(data.filter(item => item.id !== id));
+    };
+
     return (
         <div className="w-full flex flex-col p-2">
             {contextHolder}
-            <BreadcrumbHeader
-                isChecked={isChecked}
-                links={links}
-                label={label}
-            />
-            <TableList
-                columns={columns}
-                data={data}
-                label={label}
-                loading={loading}
-                newItem={true}
-                searchItem={setSearch}
-                search={search}
-                changePage={setPage}
-                current={page}
-                total={total}
-                selectedProvider={selectedProvider}
-                setSelectedProvider={setSelectedProvider}
-                onOpen={onOpen}
-                setProvider={setProvider}
-                isOpen={isOpen}
-                deleteItem={(id) => handleModal(id)}
-                openFilter={openFilter}
-                setOpenFilter={setOpenFilter}
-                isChecked={isChecked}
-                setIsChecked={setIsChecked}
-                isDelete={isDelete}
-                setIsDelete={setIsDelete}
-            />
-            <ModalEditItem
-                isOpen={isOpen}
-                onClose={onClose}
-                selectedProvider={selectedProvider}
-                setSelectedProvider={setSelectedProvider}
-                provider={provider}
-                setProvider={setProvider}
-                formData01={formData01}
-                setFormData01={setFormData01}
-                formData02={formData02}
-                setFormData02={setFormData02}
-                addProvider={addProvider}
-                updateProvider={updateProvider}
-            />
+            <style>{styles}</style>
+            <Text as="h1" fontSize="xl" color="blue.700" p={1} pt={0} spacing='8px' px={1} >
+                {label}
+            </Text>
 
-            {!isOpen &&
-                <Modal
-                    title={
-                        <span><ExclamationCircleFilled style={{ color: '#faad14', marginRight: 8 }} />¿{`${isDelete ? 'Eliminar' : 'Archivar'}`} proveedor?</span>
-                    }
-                    open={isModalOpen}
-                    onOk={() => {
-                        if (isDelete) deleteItem({ id: providerDelete?.id });
-                        else archiverItem({ id: providerDelete?.id, archive: !providerDelete?.archive });
-                    }}
-                    onCancel={() => setIsModalOpen(false)}
-                    centered
-                    okType={isDelete ? 'danger' : 'primary'}
-                    okText={isDelete ? 'Eliminar' : 'Archivar'}
-                >
-                    <div className='px-6'>
-                        <p>{`${isDelete ? '¿Estás seguro de que deseas eliminar al proveedor' : '¿Desea archivar al proveedor'} `}
-                            <Code fontWeight="bold" colorScheme='blackAlpha'>{providerDelete?.name} {providerDelete?.last_name}</Code>?
-                            {isDelete && <><br /> Esta acción no se puede deshacer.</>}
-                        </p>
-                    </div>
-                    <BottomMessage>
-                        <Code fontWeight="bold" colorScheme='blackAlpha'>Esc</Code> para cerrar ventana
-                    </BottomMessage>
-                </Modal>
-            }
+            <Button
+                onClick={() => {
+                    setData([
+                        { id: data.length + 1, name: '', age: 0, birthdate: null, status: 'EDIT' },
+                        ...data
+                    ]);
+                }}
+            >
+                Add record
+            </Button>
+            <hr />
+            <Table height={420} data={data}>
+                <Column flexGrow={1}>
+                    <HeaderCell>Name</HeaderCell>
+                    <EditableCell
+                        dataKey="name"
+                        dataType="string"
+                        onChange={handleChange}
+                        onEdit={handleEdit}
+                    />
+                </Column>
+
+                <Column width={200}>
+                    <HeaderCell>Age</HeaderCell>
+                    <EditableCell
+                        dataKey="age"
+                        dataType="number"
+                        onChange={handleChange}
+                        onEdit={handleEdit}
+                    />
+                </Column>
+
+                <Column width={200}>
+                    <HeaderCell>Birthday</HeaderCell>
+                    <EditableCell
+                        dataKey="birthdate"
+                        dataType="date"
+                        onChange={handleChange}
+                        onEdit={handleEdit}
+                    />
+                </Column>
+
+                <Column width={100}>
+                    <HeaderCell>Action</HeaderCell>
+                    <ActionCell dataKey="id" onEdit={handleEdit} onRemove={handleRemove} />
+                </Column>
+            </Table>
+
         </div>
     );
 };
 
-export default ProvidersPage;
+
+
+
+
+function toValueString(value, dataType) {
+    return dataType === 'date' ? value?.toLocaleDateString() : value;
+}
+
+const fieldMap = {
+    string: Input,
+    number: InputNumber,
+    date: DatePicker
+};
+
+const EditableCell = ({ rowData, dataType, dataKey, onChange, onEdit, ...props }) => {
+    const editing = rowData.status === 'EDIT';
+
+    const Field = fieldMap[dataType];
+    const value = rowData[dataKey];
+    const text = toValueString(value, dataType);
+
+    return (
+        <Cell
+            {...props}
+            className={editing ? 'table-cell-editing' : ''}
+            onDoubleClick={() => {
+                onEdit?.(rowData.id);
+            }}
+        >
+            {editing ? (
+                <Field
+                    defaultValue={value}
+                    onChange={value => {
+                        onChange?.(rowData.id, dataKey, value);
+                    }}
+                />
+            ) : (
+                text
+            )}
+        </Cell>
+    );
+};
+
+const ActionCell = ({ rowData, dataKey, onEdit, onRemove, ...props }) => {
+    return (
+        <Cell {...props} style={{ padding: '6px', display: 'flex', gap: '4px' }}>
+            <IconButton
+                appearance="subtle"
+                icon={rowData.status === 'EDIT' ? <VscSave /> : <VscEdit />}
+                onClick={() => {
+                    onEdit(rowData.id);
+                }}
+            />
+            <IconButton
+                appearance="subtle"
+                icon={<VscRemove />}
+                onClick={() => {
+                    onRemove(rowData.id);
+                }}
+            />
+        </Cell>
+    );
+};
+
+export default InventoryPage;

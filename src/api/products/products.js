@@ -1,21 +1,42 @@
 import { data } from 'autoprefixer';
 import Fetcher from '../../libs/Fetcher';
 
-export const indexProviders = async ({
+export const indexWarehouses = async ({
     store,
-    page,
-    search,
-    isChecked
 }) => {
     let response = { status: false }
-    let archive = isChecked == 'true' ? true : false;
-    let params = { store, page, isChecked: archive }
+    let params = { store_id: store }
+    
+    try {
+        let fetch = await Fetcher({
+            method: 'GET',
+            url: `/inventory`,
+            params
+        });
+
+        if (fetch.status == 200) {
+            response = { status: true, data: fetch?.data };
+        }
+    } catch (error) {
+        console.log("🚀 ~ indexWarehouses error:", error)
+    } finally {
+        return response
+    }
+}
+
+export const indexProducts = async ({
+    store,
+    page,
+    search
+}) => {
+    let response = { status: false }
+    let params = { store, page }
     if (search) params.search = search
     
     try {
         let fetch = await Fetcher({
             method: 'GET',
-            url: `/provider`,
+            url: `/products`,
             params
         });
 
