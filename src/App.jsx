@@ -1,4 +1,3 @@
-// src/App.tsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import LayoutComponent from './components/Layout';
@@ -28,6 +27,9 @@ const App = () => {
                 <Route path="*" element={<h2>Página no encontrada</h2>} />
 
                 <Route path={`/${inventory}`} element={<DirectoryInventory />} />
+                <Route path={`/${inventory}/products`} element={<InventoryPage />} />
+
+
                 <Route path={`/${directory}/:inventory_id`} element={<InventoryPage />} />
 
                 <Route path={`/${directory}`} element={<DirectoryMenu />} />

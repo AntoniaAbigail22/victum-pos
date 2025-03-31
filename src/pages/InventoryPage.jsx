@@ -1,378 +1,400 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Modal, Space, notification } from 'antd';
-import { ExclamationCircleFilled, EditOutlined, DeleteOutlined, InboxOutlined, PhoneOutlined, MailOutlined } from '@ant-design/icons';
-import { Code, Text, useDisclosure } from "@chakra-ui/react";
-import TableList from '../components/TableList';
-import ModalEditItem from '../components/ModalEditItem';
-import { openNotification } from '../libs/Extras';
-import { indexProviders, getBillingByProvider, deleteProvider, createProvider, upProvider, setArchiveProvider } from "../api/providers/providers"
-import BreadcrumbHeader from '../components/BreadcrumbHeader';
-import BottomMessage from '../components/BottomMessage';
-
-import { Table, IconButton, Input, DatePicker, InputNumber } from 'rsuite';
-import { VscEdit, VscSave, VscRemove } from 'react-icons/vsc';
-import { indexProducts } from '../api/products/products';
-
-const { Column, HeaderCell, Cell } = Table;
-
-const styles = `
-    .table-cell-editing .rs-table-cell-content {
-    padding: 4px;
-    }
-    .table-cell-editing .rs-input {
-    width: 100%;
-    }
-`;
+import React, { useState, useEffect } from "react";
+import {
+  Button,
+  Modal,
+  Space,
+  notification,
+  Tag,
+  InputNumber,
+  Avatar,
+} from "antd";
+import {
+  ExclamationCircleFilled,
+  EditOutlined,
+  DeleteOutlined,
+  InboxOutlined,
+  ShoppingOutlined,
+  PictureOutlined,
+} from "@ant-design/icons";
+import { Code, useDisclosure } from "@chakra-ui/react";
+import TableList from "../components/TableList";
+import ModalEditProduct from "../components/ModalEditProduct";
+import { openNotification } from "../libs/Extras";
+import {
+  indexProducts,
+  deleteProduct,
+  createProduct,
+  updateProduct,
+  setArchiveProduct,
+} from "../api/products/products";
+import BreadcrumbHeader from "../components/BreadcrumbHeader";
+import BottomMessage from "../components/BottomMessage";
 
 const InventoryPage = () => {
+  const [api, contextHolder] = notification.useNotification();
+  const sendNotification = (type, description) =>
+    openNotification(api, type, description);
 
-    const [api, contextHolder] = notification.useNotification();
-    const sendNotification = (type, description) => openNotification(api, type, description)
+  const store = 1;
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [data, setData] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState(null);
+  const [isDelete, setIsDelete] = useState(false);
+  const [formData, setFormData] = useState({
+    code: "",
+    description: "",
+    price_cost: 0,
+    price_sale: 0,
+    price_whole: 0,
+    quanty_whole: 1,
+    mode_sale: 1,
+    category_id: null,
+    image_url: null,
+    utility: 0,
+  });
+  const [openFilter, setOpenFilter] = useState(false);
+  const [isChecked, setIsChecked] = useState("false");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [productDelete, setProductDelete] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [categories, setCategories] = useState([]);
 
-    const store = 1;
-    const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
-    const [data, setData] = useState([]);
-    const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [provider, setProvider] = useState(null);
-    const [isDelete, setIsDelete] = useState(false);
-    const [formData01, setFormData01] = useState(null);
-    const [formData02, setFormData02] = useState(null);
-    const [openFilter, setOpenFilter] = useState(false);
-    const [isChecked, setIsChecked] = useState("false");
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [providerDelete, setProviderDelete] = useState(null);
-    const [selectedProvider, setSelectedProvider] = useState(null);
+  useEffect(() => {
+    getProducts();
+  }, [page, search, isChecked]);
 
-    useEffect(() => {
-        getProviders();
-    }, [page, search, isChecked]);
+  const getProducts = async () => {
+    setLoading(true);
+    try {
+      const response = await indexProducts({
+        store,
+        page,
+        search,
+        archive: isChecked === "true",
+      });
 
-    useEffect(() => {
-        if (selectedProvider && provider?.id) getBilling()
-    }, [selectedProvider, provider?.id]);
+      if (response?.status) {
+        setData(response?.data?.data);
+        setTotal(response?.data?.total);
+      }
+    } catch (error) {
+      console.error("Error al cargar productos:", error);
+      sendNotification("error", "No se pudieron cargar los productos");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handleAddProduct = async () => {
+    try {
+      const response = await createProduct({
+        product: formData,
+        store_id: store,
+      });
 
-    const getProviders = async () => {
-        try {
-            const response = await indexProducts({ store, page, search })
-            if (response?.status) {
-                setData(response?.data?.data)
-                setTotal(response?.data?.total)
-            }
-        } catch (error) {
-            console.log("🚀 ~ getProviders ~ error:", error)
-        } finally {
-            setLoading(false);
-            setProviderDelete(null);
-            setProvider(null);
-            setSelectedProvider(null);
+      if (response.status) {
+        sendNotification("success", "Producto creado correctamente");
+        onClose();
+        getProducts();
+        resetForm();
+      }
+    } catch (error) {
+      console.error("Error al crear producto:", error);
+      sendNotification("error", "Error al crear producto");
+    }
+  };
+
+  const handleUpdateProduct = async () => {
+    try {
+      const response = await updateProduct({
+        id: selectedProduct,
+        product: formData,
+        store_id: store,
+      });
+
+      if (response.status) {
+        sendNotification("success", "Producto actualizado correctamente");
+        onClose();
+        getProducts();
+        resetForm();
+      }
+    } catch (error) {
+      console.error("Error al actualizar producto:", error);
+      sendNotification("error", "Error al actualizar producto");
+    }
+  };
+
+  const handleArchive = async ({ id, archive }) => {
+    try {
+      const response = await setArchiveProduct({ id, archive });
+      if (response.status) {
+        sendNotification(
+          "success",
+          archive ? "Producto archivado" : "Producto activado"
+        );
+        getProducts();
+      }
+    } catch (error) {
+      console.error("Error al archivar producto:", error);
+      sendNotification("error", "Error al archivar producto");
+    }
+  };
+
+  const handleDelete = async ({ id }) => {
+    try {
+      const response = await deleteProduct({ id });
+      if (response.status) {
+        sendNotification("success", "Producto eliminado correctamente");
+        getProducts();
+      }
+    } catch (error) {
+      console.error("Error al eliminar producto:", error);
+      sendNotification("error", "Error al eliminar producto");
+    }
+  };
+
+  const handleModal = (id, mode) => {
+    if (id) {
+      const item = data.find((item) => item?.id === id);
+      setProductDelete(item);
+      setIsModalOpen(true);
+      setIsDelete(mode);
+    }
+  };
+
+  const handleEdit = (record) => {
+    setSelectedProduct(record?.id);
+    setProduct(record);
+    setFormData({
+      code: record.code || "",
+      description: record.description || "",
+      price_cost: record.price_cost || 0,
+      price_sale: record.price_sale || 0,
+      price_whole: record.price_whole || 0,
+      quanty_whole: record.quanty_whole || 1,
+      mode_sale: record.mode_sale || 1,
+      category_id: record.category_id || null,
+      image_url: record.image_url || null,
+      utility: record.utility || 0,
+    });
+    onOpen();
+  };
+
+  const resetForm = () => {
+    setFormData({
+      code: "",
+      description: "",
+      price_cost: 0,
+      price_sale: 0,
+      price_whole: 0,
+      quanty_whole: 1,
+      mode_sale: 1,
+      category_id: null,
+      image_url: null,
+      utility: 0,
+    });
+    setSelectedProduct(null);
+  };
+
+  const label = "Inventario";
+  const links = [{ href: "/inventory", label: "Inventario" }, { label: label }];
+
+  const columns = [
+    {
+      title: "Imagen",
+      dataIndex: "image_url",
+      key: "image",
+      width: 80,
+      render: (image_url) => (
+        <Avatar
+          src={image_url}
+          icon={!image_url && <PictureOutlined />}
+          style={{
+            backgroundColor: !image_url ? "#1890ff" : "transparent",
+            color: !image_url ? "#fff" : "inherit",
+          }}
+          size="large"
+        />
+      ),
+    },
+    {
+      title: "Código",
+      dataIndex: "code",
+      key: "code",
+      width: 120,
+      sorter: (a, b) => a.code.localeCompare(b.code),
+    },
+    {
+      title: "Descripción",
+      dataIndex: "description",
+      key: "description",
+      ellipsis: true,
+    },
+    {
+      title: "Precio Costo",
+      dataIndex: "price_cost",
+      key: "price_cost",
+      render: (price) => `$${price?.toFixed(2)}`,
+      width: 120,
+      align: "right",
+    },
+    {
+      title: "Precio Venta",
+      dataIndex: "price_sale",
+      key: "price_sale",
+      render: (price) => `$${price?.toFixed(2)}`,
+      width: 120,
+      align: "right",
+    },
+    {
+      title: "Utilidad",
+      dataIndex: "utility",
+      key: "utility",
+      render: (utility) => (
+        <Tag color={utility >= 0 ? "green" : "red"}>{utility?.toFixed(2)}%</Tag>
+      ),
+      width: 100,
+      align: "right",
+    },
+    {
+      title: "Stock",
+      dataIndex: "quanty_whole",
+      key: "stock",
+      render: (stock) => (
+        <InputNumber
+          value={stock}
+          disabled
+          prefix={<ShoppingOutlined />}
+          style={{ width: "100%" }}
+        />
+      ),
+      width: 120,
+      align: "right",
+    },
+    {
+      title: "Acciones",
+      key: "action",
+      width: 120,
+      render: (record) => (
+        <Space size="small">
+          <Button
+            type="default"
+            icon={record?.archive ? <DeleteOutlined /> : <InboxOutlined />}
+            onClick={() => handleModal(record?.id, record?.archive)}
+          />
+          <Button
+            type="default"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+          />
+        </Space>
+      ),
+    },
+  ];
+
+  return (
+    <div className="w-full flex flex-col p-2">
+      {contextHolder}
+      <BreadcrumbHeader isChecked={isChecked} links={links} label={label} />
+
+      <TableList
+        columns={columns}
+        data={data}
+        label={label}
+        loading={loading}
+        newItem={true}
+        searchItem={setSearch}
+        search={search}
+        changePage={setPage}
+        current={page}
+        total={total}
+        selectedProvider={selectedProduct}
+        setSelectedProvider={setSelectedProduct}
+        onOpen={() => {
+          resetForm();
+          onOpen();
+        }}
+        setProvider={setProduct}
+        isOpen={isOpen}
+        deleteItem={(id) => handleModal(id, true)}
+        openFilter={openFilter}
+        setOpenFilter={setOpenFilter}
+        isChecked={isChecked}
+        setIsChecked={setIsChecked}
+      />
+
+      <ModalEditProduct
+        isOpen={isOpen}
+        onClose={() => {
+          onClose();
+          resetForm();
+        }}
+        selectedProduct={selectedProduct}
+        setSelectedProduct={setSelectedProduct}
+        product={product}
+        setProduct={setProduct}
+        formData={formData}
+        setFormData={setFormData}
+        addProduct={handleAddProduct}
+        updateProduct={handleUpdateProduct}
+        categories={categories}
+      />
+
+      <Modal
+        title={
+          <span>
+            <ExclamationCircleFilled
+              style={{ color: "#faad14", marginRight: 8 }}
+            />
+            ¿{isDelete ? "Eliminar" : "Archivar"} producto?
+          </span>
         }
-    };
-
-    const addProvider = async () => {
-        try {
-            const response = await createProvider({ provider: formData01, billing: formData02, store_id: store })
-            if (response?.status) {
-                sendNotification('success', `Se agrego al proveedor ${response?.data?.provider?.name} ${response?.data?.provider?.last_name} con éxito`)
-                onClose()
-            }
-            else sendNotification('error')
-        } catch (error) {
-            console.log("🚀 ~ getProviders ~ error:", error)
-        } finally {
-            getProviders()
-        }
-    };
-
-    const updateProvider = async () => {
-        try {
-            const response = await upProvider({ provider: formData01, billing: formData02, id: selectedProvider || provider?.id, store_id: store })
-            if (response?.status) {
-                sendNotification('success', `Se actualizó al proveedor ${provider?.name} ${provider?.last_name} con éxito`)
-                onClose()
-            }
-            else sendNotification('error')
-        } catch (error) {
-            console.log("🚀 ~ updateProvider ~ error:", error)
-        } finally {
-            getProviders()
-        }
-    };
-
-    const getBilling = async () => {
-        try {
-            const response = await getBillingByProvider({ id: selectedProvider })
-            if (response?.status) setProvider({ ...provider, billing: response?.data });
-        } catch (error) {
-            console.log("🚀 ~ getProviders ~ error:", error)
-        }
-    };
-
-    const archiverItem = async ({ id, archive }) => {
-        try {
-            let response = await setArchiveProvider({ id, archive })
-            if (response?.status) sendNotification('success', 'Proveedor archivado con éxito')
-            else sendNotification('error')
-        } catch (error) {
-            console.error("🚀 ~ deleteProvider ~ error:", error)
-        } finally {
-            setProvider(null);
-            setSelectedProvider(null);
-            setProviderDelete(null)
-            getProviders()
-            setIsModalOpen(false);
-        }
-    };
-
-    const deleteItem = async ({ id }) => {
-        try {
-            let response = await deleteProvider({ id })
-            if (response?.status) sendNotification('success', 'Proveedor eliminado con éxito')
-            else sendNotification('error')
-        } catch (error) {
-            console.error("🚀 ~ deleteProvider ~ error:", error)
-        } finally {
-            setProvider(null);
-            setSelectedProvider(null);
-            setProviderDelete(null)
-            getProviders()
-            setIsModalOpen(false);
-        }
-    };
-
-    const handleModal = (id, mode) => {
-        if (id) {
-            let item = data.find((item) => item?.id === id)
-            console.log("🚀 ~ handleModal ~ item:", item)
-            setProviderDelete(item);
-            setIsModalOpen(!isModalOpen);
-            if (mode) setIsDelete(true)
-            else setIsDelete(false)
-        }
-    };
-
-    const handlePhoneClick = phone => {
-        window.location.href = `tel:${phone}`;
-    };
-
-    const label = 'Inventario';
-    const links = [
-        {
-            label: 'Inventario'
-        }
-    ]
-
-    const columns = [
-        {
-            title: '#',
-            key: 'index',
-            width: 1,
-            render: (_, __, index) => (
-                <span className='font-bold italic'>
-                    {(page - 1) * 10 + index + 1}
-                </span>
-            ),
-        },
-        {
-            title: 'Nombre',
-            key: 'name',
-            render: ({ name, last_name }) => (
-                <span>
-                    {name} {last_name}
-                </span>
-            ),
-        },
-        {
-            title: 'Contacto',
-            key: 'contact',
-            width: 1,
-            render: ({ phone, email }) => (
-                <span>
-                    <span>
-                        {phone} <Button color="primary" variant="outlined" icon={<PhoneOutlined />} size={'small'} onClick={() => handlePhoneClick(phone)} />
-                    </span> <br />
-                    <span>
-                        {email} {/*<Button color="primary" variant="outlined" icon={<MailOutlined />} size={'small'} onClick={() => handleEmailClick(email)}/>*/}
-                    </span>
-                </span>
-            ),
-        },
-        {
-            title: 'Empresa',
-            dataIndex: 'company',
-            key: 'company',
-            width: 1,
-        },
-        {
-            title: '',
-            key: 'action',
-            width: 1,
-            render: (record) => (
-                <Space size='small'>
-                    <Button
-                        type='default'
-                        icon={!record?.archive ? <InboxOutlined /> : <DeleteOutlined />}
-                        onClick={() => handleModal(record?.id, record?.archive)}
-                    />
-                    <Button
-                        type='default'
-                        icon={<EditOutlined />}
-                        onClick={() => {
-                            setSelectedProvider(record?.id)
-                            setProvider(record);
-                            onOpen()
-                        }}
-                    />
-                </Space>
-            ),
-        },
-    ];
-
-    //const [data, setData] = React.useState(defaultData);
-
-    const handleChange = (id, key, value) => {
-        const nextData = Object.assign([], data);
-        nextData.find(item => item.id === id)[key] = value;
-        setData(nextData);
-    };
-    const handleEdit = id => {
-        const nextData = Object.assign([], data);
-        const activeItem = nextData.find(item => item.id === id);
-
-        activeItem.status = activeItem.status ? null : 'EDIT';
-
-        setData(nextData);
-    };
-
-    const handleRemove = id => {
-        setData(data.filter(item => item.id !== id));
-    };
-
-    return (
-        <div className="w-full flex flex-col p-2">
-            {contextHolder}
-            <style>{styles}</style>
-            <Text as="h1" fontSize="xl" color="blue.700" p={1} pt={0} spacing='8px' px={1} >
-                {label}
-            </Text>
-
-            <Button
-                onClick={() => {
-                    setData([
-                        { id: data.length + 1, name: '', age: 0, birthdate: null, status: 'EDIT' },
-                        ...data
-                    ]);
-                }}
-            >
-                Add record
-            </Button>
-            <hr />
-            <Table height={420} data={data}>
-                <Column flexGrow={1}>
-                    <HeaderCell>Name</HeaderCell>
-                    <EditableCell
-                        dataKey="name"
-                        dataType="string"
-                        onChange={handleChange}
-                        onEdit={handleEdit}
-                    />
-                </Column>
-
-                <Column width={200}>
-                    <HeaderCell>Age</HeaderCell>
-                    <EditableCell
-                        dataKey="age"
-                        dataType="number"
-                        onChange={handleChange}
-                        onEdit={handleEdit}
-                    />
-                </Column>
-
-                <Column width={200}>
-                    <HeaderCell>Birthday</HeaderCell>
-                    <EditableCell
-                        dataKey="birthdate"
-                        dataType="date"
-                        onChange={handleChange}
-                        onEdit={handleEdit}
-                    />
-                </Column>
-
-                <Column width={100}>
-                    <HeaderCell>Action</HeaderCell>
-                    <ActionCell dataKey="id" onEdit={handleEdit} onRemove={handleRemove} />
-                </Column>
-            </Table>
-
-        </div>
-    );
-};
-
-
-
-
-
-function toValueString(value, dataType) {
-    return dataType === 'date' ? value?.toLocaleDateString() : value;
-}
-
-const fieldMap = {
-    string: Input,
-    number: InputNumber,
-    date: DatePicker
-};
-
-const EditableCell = ({ rowData, dataType, dataKey, onChange, onEdit, ...props }) => {
-    const editing = rowData.status === 'EDIT';
-
-    const Field = fieldMap[dataType];
-    const value = rowData[dataKey];
-    const text = toValueString(value, dataType);
-
-    return (
-        <Cell
-            {...props}
-            className={editing ? 'table-cell-editing' : ''}
-            onDoubleClick={() => {
-                onEdit?.(rowData.id);
-            }}
-        >
-            {editing ? (
-                <Field
-                    defaultValue={value}
-                    onChange={value => {
-                        onChange?.(rowData.id, dataKey, value);
-                    }}
-                />
-            ) : (
-                text
+        open={isModalOpen}
+        onOk={() => {
+          isDelete
+            ? handleDelete({ id: productDelete?.id })
+            : handleArchive({
+                id: productDelete?.id,
+                archive: !productDelete?.archive,
+              });
+          setIsModalOpen(false);
+        }}
+        onCancel={() => setIsModalOpen(false)}
+        centered
+        okType={isDelete ? "danger" : "primary"}
+        okText={isDelete ? "Eliminar" : "Archivar"}
+      >
+        <div className="px-6">
+          <p>
+            {`${
+              isDelete
+                ? "¿Estás seguro de eliminar el producto"
+                : "¿Desea archivar el producto"
+            } `}
+            <Code fontWeight="bold" colorScheme="blackAlpha">
+              {productDelete?.description}
+            </Code>
+            ?
+            {isDelete && (
+              <>
+                <br /> Esta acción no se puede deshacer.
+              </>
             )}
-        </Cell>
-    );
-};
-
-const ActionCell = ({ rowData, dataKey, onEdit, onRemove, ...props }) => {
-    return (
-        <Cell {...props} style={{ padding: '6px', display: 'flex', gap: '4px' }}>
-            <IconButton
-                appearance="subtle"
-                icon={rowData.status === 'EDIT' ? <VscSave /> : <VscEdit />}
-                onClick={() => {
-                    onEdit(rowData.id);
-                }}
-            />
-            <IconButton
-                appearance="subtle"
-                icon={<VscRemove />}
-                onClick={() => {
-                    onRemove(rowData.id);
-                }}
-            />
-        </Cell>
-    );
+          </p>
+        </div>
+        <BottomMessage>
+          <Code fontWeight="bold" colorScheme="blackAlpha">
+            Esc
+          </Code>{" "}
+          para cerrar ventana
+        </BottomMessage>
+      </Modal>
+    </div>
+  );
 };
 
 export default InventoryPage;
