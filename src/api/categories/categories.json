@@ -1,0 +1,23 @@
+[
+    {
+      "id": 1,
+      "name": "Electrónica",
+      "created_at": "2023-01-15T12:00:00Z",
+      "color": "#1890ff",
+      "image_url": ""
+    },
+    {
+      "id": 2,
+      "name": "Ropa",
+      "created_at": "2023-02-20T12:00:00Z",
+      "color": "#ff4d4f",
+      "image_url": ""
+    },
+    {
+      "id": 3,
+      "name": "Alimentos",
+      "created_at": "2023-03-05T12:00:00Z",
+      "color": "#52c41a",
+      "image_url": ""
+    }
+  ]

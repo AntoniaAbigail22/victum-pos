@@ -10,6 +10,7 @@ import DirectoryMenu from './components/DirectoryMenu';
 import DirectoryInventory from './components/DirectoryInventory'
 import ProvidersPage from './pages/ProvidersPage';
 import InventoryPage from './pages/InventoryPage';
+import DepartmentsPage from './pages/DepartmentsPage';
 
 const directory = 'directory'
 const inventory = 'inventory'
@@ -28,6 +29,7 @@ const App = () => {
 
                 <Route path={`/${inventory}`} element={<DirectoryInventory />} />
                 <Route path={`/${inventory}/products`} element={<InventoryPage />} />
+                <Route path={`/${inventory}/departments`} element={<DepartmentsPage />} />
 
 
                 <Route path={`/${directory}/:inventory_id`} element={<InventoryPage />} />
