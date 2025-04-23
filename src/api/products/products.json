@@ -1,0 +1,30 @@
+{
+  "status": true,
+  "data": [
+    {
+      "id": 1,
+      "code": "PROD-001",
+      "description": "Laptop HP 15\"",
+      "price_cost": 12000.00,
+      "price_sale": 15000.00,
+      "price_whole": 14000.00,
+      "quanty_whole": 10,
+      "utility": 25.00,
+      "category": { "name": "Electrónicos" },
+      "image_url": null
+    },
+    {
+      "id": 2,
+      "code": "PROD-002",
+      "description": "Mouse inalámbrico",
+      "price_cost": 200.00,
+      "price_sale": 350.00,
+      "price_whole": 300.00,
+      "quanty_whole": 50,
+      "utility": 75.00,
+      "category": { "name": "Accesorios" },
+      "image_url": "https://example.com/mouse.jpg"
+    }
+  ],
+  "total": 2
+}

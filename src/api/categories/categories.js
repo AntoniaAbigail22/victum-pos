@@ -1,13 +1,14 @@
 import categoriesData from './categories.json';
 
+// Obtener todas las categorías
 export const indexCategories = async () => {
   try {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve({ 
-          status: true, 
+        resolve({
+          status: true,
           data: categoriesData,
-          total: categoriesData.length
+          total: categoriesData.length,
         });
       }, 500);
     });
@@ -16,6 +17,7 @@ export const indexCategories = async () => {
   }
 };
 
+// Eliminar una categoría
 export const deleteCategory = async ({ id }) => {
   try {
     return new Promise((resolve) => {
@@ -31,5 +33,21 @@ export const deleteCategory = async ({ id }) => {
     });
   } catch (error) {
     throw new Error('Error al eliminar categoría');
+  }
+};
+
+// Crear una nueva categoría
+export const createCategory = async (newCategory) => {
+  try {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newId = categoriesData.length ? Math.max(...categoriesData.map(cat => cat.id)) + 1 : 1;
+        const categoryToAdd = { id: newId, ...newCategory };
+        categoriesData.push(categoryToAdd);
+        resolve({ status: true, data: categoryToAdd });
+      }, 500);
+    });
+  } catch (error) {
+    throw new Error('Error al crear categoría');
   }
 };
