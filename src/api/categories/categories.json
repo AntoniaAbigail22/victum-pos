@@ -1,23 +1,24 @@
-[
-    {
-      "id": 1,
-      "name": "Electrónica",
-      "created_at": "2023-01-15T12:00:00Z",
-      "color": "#1890ff",
-      "image_url": ""
-    },
-    {
-      "id": 2,
-      "name": "Ropa",
-      "created_at": "2023-02-20T12:00:00Z",
-      "color": "#ff4d4f",
-      "image_url": ""
-    },
-    {
-      "id": 3,
-      "name": "Alimentos",
-      "created_at": "2023-03-05T12:00:00Z",
-      "color": "#52c41a",
-      "image_url": ""
-    }
-  ]
+{
+    "status": true,
+    "data": [
+      {
+        "id": 1,
+        "name": "Electrónicos",
+        "description": "Productos electrónicos",
+        "color": "#FF6B6B",
+        "products_count": 24,
+        "archive": false,
+        "created_at": "2023-05-15T10:30:00Z"
+      },
+      {
+        "id": 2,
+        "name": "Ropa",
+        "description": "Prendas de vestir",
+        "color": "#4ECDC4",
+        "products_count": 18,
+        "archive": false,
+        "created_at": "2023-06-20T14:45:00Z"
+      }
+    ],
+    "total": 2
+  }

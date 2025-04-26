@@ -11,6 +11,8 @@ import DirectoryInventory from './components/DirectoryInventory'
 import ProvidersPage from './pages/ProvidersPage';
 import InventoryPage from './pages/InventoryPage';
 import DepartmentsPage from './pages/DepartmentsPage';
+import Login from './components/Login';
+
 
 const directory = 'directory'
 const inventory = 'inventory'
@@ -19,6 +21,7 @@ const sales = 'sales'
 const App = () => {
     return (
         <Routes>
+              <Route path="/login" element={<Login />} />
             <Route path="/" element={<LayoutComponent />}>
                 <Route index element={<Ventas />} />
                 <Route path={`/${sales}`} element={<Ventas />} />
