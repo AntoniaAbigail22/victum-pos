@@ -11,13 +11,13 @@ import {
     FormHelperText,
 } from '@chakra-ui/react'
 import { notification } from 'antd';
-import { DATA_FORM_PROVIDERS, openNotification, skipHandleKeyDown, validateEmail, validateErrors, validateLabelErrors } from '../libs/Extras';
-import BottomMessage from './BottomMessage';
-import Codes from './Codes';
-import FormErrorText from './FormErrorText';
-import FormInputField from './FormInputField';
+import Codes from '../Codes';
+import FormErrorText from '../FormErrorText';
+import FormInputField from '../FormInputField';
+import { DATA_FORM_PROVIDERS, openNotification, validateEmail, validateErrors, skipHandleKeyDown, validateLabelErrors } from '../../libs/Extras';
+import BottomMessage from '../BottomMessage';
 
-const ModalEditItem = ({
+const ModalEditProvider = ({
     type,
     isOpen,
     onClose,
@@ -35,7 +35,6 @@ const ModalEditItem = ({
 
     const [api, contextHolder] = notification.useNotification();
     const sendNotification = (type, description) => openNotification(api, type, description)
-    const [tabIndex, setTabIndex] = useState(0);
 
     useEffect(() => {
         if (element) {
@@ -78,6 +77,8 @@ const ModalEditItem = ({
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
+
+    const [tabIndex, setTabIndex] = useState(0);
 
     const handleKeyDown = event => {
         if (skipHandleKeyDown(event, ['ArrowLeft', 'ArrowRight', 'F10', 'Escape'], ['F10'])) return;
@@ -447,4 +448,4 @@ const ModalEditItem = ({
     );
 };
 
-export default ModalEditItem;
+export default ModalEditProvider;

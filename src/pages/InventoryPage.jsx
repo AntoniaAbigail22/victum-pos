@@ -200,7 +200,7 @@ const InventoryPage = () => {
     setSelectedProduct(null);
   };
 
-  const label = "Inventario";
+  const label = "Productos";
   const links = [{ href: "/inventory", label: "Inventario" }, { label: label }];
 
   const columns = [

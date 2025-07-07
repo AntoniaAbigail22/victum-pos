@@ -1,13 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Table, Spin, Button, Input, Empty, Drawer, Tooltip } from 'antd';
+import { Dropdown, Menu, Checkbox } from 'antd';
+import { SettingOutlined } from '@ant-design/icons';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
-import { Code, FormControl, FormLabel, Box } from '@chakra-ui/react';
+import { Code, FormControl, FormLabel, Box, Text } from '@chakra-ui/react';
 import { Radio, RadioGroup, Stack } from "@chakra-ui/react";
 import BottomMessage from './BottomMessage';
 import CustomEmpty from './CustomEmpty';
+import Codes from './Codes';
+import { skipHandleKeyDown } from '../libs/Extras';
+import { Collapse } from 'antd';
+import { parse } from 'date-fns';
+const { Panel } = Collapse;
 
 const TableList = ({
     columns,
+    visibleColumns = [],
+    setVisibleColumns,
     data,
     label,
     loading,
@@ -17,24 +26,29 @@ const TableList = ({
     search,
     current,
     total,
-    selectedProvider,
-    setSelectedProvider,
+    selectedElement,
+    setSelectedElement,
     onOpen,
-    setProvider,
+    setElement,
     isOpen,
     deleteItem,
     openFilter,
     setOpenFilter,
     isChecked,
     setIsChecked,
+    expandexRow,
+    columnsExtras
 }) => {
 
     const [selectedRowKey, setSelectedRowKey] = useState(null);
+    const [expandedRowKey, setExpandedRowKey] = useState(null);
     const tableRef = useRef(null);
 
     const handleRowClick = (record) => {
-        setSelectedRowKey(record.id);
-        setSelectedProvider(record?.id);
+        console.log("🚀 ~ handleRowClick ~ record:", record)
+        setSelectedRowKey(record?.id);
+        setSelectedElement(record?.id);
+        setExpandedRowKey(record?.id);
     };
 
     const handleSearch = (value) => {
@@ -45,16 +59,20 @@ const TableList = ({
 
     const handleNew = () => {
         setSelectedRowKey(null);
-        setSelectedProvider(null);
-        setProvider(null);
+        setSelectedElement(null);
+        setElement(null);
         onOpen();
     };
 
-    const handleEdit = () => {
-        if (selectedRowKey) {
-            setSelectedProvider(selectedRowKey);
-            const item = data.find((item) => item?.id === selectedRowKey);
-            setProvider(item);
+    const handleEdit = (record) => {
+        console.log("🚀 ~ handleEdit ~ selectedRowKey:", selectedRowKey, record)
+        let id = selectedRowKey || record?.id;
+        if (id) {
+            setSelectedElement(id);
+            const item = data.find((item) => item?.id === id);
+            setElement(item);
+
+            console.log("🚀 ~ handleEdit ~ item:", item)
             onOpen();
         } else {
             console.log('Selecciona una fila para editar');
@@ -70,46 +88,44 @@ const TableList = ({
     };
 
     const handleKeyDown = (event) => {
+        if (skipHandleKeyDown(event, ['ArrowDown', 'ArrowUp', 'Enter', 'Delete', 'Escape'], ['n', 'f'])) return;
         if (!tableRef.current) return;
-
+        event.preventDefault();
         const currentIndex = data.findIndex((item) => item.id === selectedRowKey);
 
-        switch (event.key) {
+        switch (event?.key) {
             case 'ArrowDown':
-                if (currentIndex + 1 < data.length)
-                    setSelectedRowKey(data[currentIndex + 1].id);
+                if (currentIndex + 1 < data.length) setSelectedRowKey(data[currentIndex + 1].id);
                 break;
             case 'ArrowUp':
-                if (currentIndex - 1 >= 0)
-                    setSelectedRowKey(data[currentIndex - 1].id);
+                if (currentIndex - 1 >= 0) setSelectedRowKey(data[currentIndex - 1].id);
                 break;
             case 'Enter':
-                event.preventDefault();
                 if (selectedRowKey && !isOpen && data.length > 0) handleEdit();
                 break;
             case 'Delete':
             case 'Backspace':
-                if (selectedRowKey && selectedProvider) handleDelete();
+                if (selectedRowKey && selectedElement) handleDelete();
                 break;
             case 'Escape':
                 setSelectedRowKey(null);
                 break;
-            default:
-                // Ctrl + N para nuevo
-                if (event.ctrlKey && event.key === 'n') {
-                    event.preventDefault();
-                    handleNew();
-                }
-                break;
         }
+        if (event?.key) {
+            let key = event?.key.toLowerCase();
+            if (event.ctrlKey && key === 'n') handleNew();
+            if (event.ctrlKey && key === 'f') setOpenFilter(true);
+        }
+
+
     };
 
     useEffect(() => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedRowKey, data]);
+    }, [selectedRowKey]);
 
-    const handleTableChange = (pagination) => {
+    const handleTableChange = pagination => {
         if (pagination.current !== undefined) changePage(pagination.current);
     };
 
@@ -121,72 +137,121 @@ const TableList = ({
         setSelectedRowKey(null);
     };
 
+    const menu = (
+        <Menu>
+            {Object.keys(visibleColumns).map(key => (
+                <Menu.Item key={key}>
+                    <Checkbox
+                        checked={visibleColumns[key]}
+                        onChange={(e) => setVisibleColumns({
+                            ...visibleColumns,
+                            [key]: e.target.checked,
+                        })}
+                    >
+                        {columns.find(col => col.key === key)?.title || key}
+                    </Checkbox>
+                </Menu.Item>
+            ))}
+        </Menu>
+    );
+
+    const expandedRowRender = (record) => {
+        return (
+            <div className="p-4 m-0 bg-gray-100 rounded">
+                <Table
+                    columns={columnsExtras}
+                    dataSource={record?.movements}
+                    rowKey="id"
+                    className='w-full custom-table p-0'
+                    size="small"
+                    pagination={false}
+                    onRow={(record) => ({
+                        //console.log("🚀 ~ expandedRowRender ~ record:", record)
+                        //onClick: () => handleRowClick(record),
+                        //onDoubleClick: () => handleEdit(record),
+                    })}
+                    locale={{ emptyText: <CustomEmpty onAddNew={handleNew} /> }}
+                />
+                <h1></h1>
+            </div>
+        );
+    };
+
     return (
         <div ref={tableRef} className='w-full min-h-[200px] flex flex-col'>
+            <div ref={tableRef} className='w-full flex flex-row justify-between items-center pb-2'>
+                {label &&
+                    <Text as="h2" fontSize="xl" color="blue.700" px={1} py={0} className='leading-[1.2]'>
+                        {label} {isChecked !== 'true' ? 'activos' : 'archivados'}
+                    </Text>
+                }
+                {visibleColumns && (
+                    <Dropdown overlay={menu} trigger={['click']}>
+                        <Button
+                            type='default'
+                            icon={<SettingOutlined />}
+                            tabIndex={6}
+                        >
+                            Columnas
+                        </Button>
+                    </Dropdown>
+                )}
+            </div>
 
-            {/* Barra superior con búsqueda y botones */}
-            <div className='flex flex-wrap gap-2 justify-between items-center mb-4'>
-                <Input
-                    placeholder='Buscar...'
-                    prefix={<SearchOutlined />}
-                    value={search}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    className='w-full sm:w-[400px]'
-                    tabIndex={0}
-                    aria-label="Buscar elemento"
-                />
-                <div className='flex gap-2 flex-wrap justify-end'>
-                    {newItem && (
-                        <Tooltip title="Ctrl + N">
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch mb-4">
+                <div className="w-full md:flex-1">
+                    <Input
+                        placeholder="Buscar..."
+                        prefix={<SearchOutlined />}
+                        value={search}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        className="w-full"
+                        tabIndex={0}
+                        aria-label="Buscar elemento"
+                    />
+                </div>
+                <div className="flex flex-wrap justify-end gap-2">
+                    <div className="flex flex-wrap gap-2">
+                        {newItem && (
                             <Button
-                                type='primary'
+                                type="primary"
                                 icon={<PlusOutlined />}
                                 onClick={handleNew}
-                                size='middle'
-                                aria-label="Agregar nuevo"
+                                size="middle"
+                                tabIndex={2}
                             >
                                 Agregar
                             </Button>
-                        </Tooltip>
-                    )}
-                    <Tooltip title="Enter / Doble click">
+                        )}
                         <Button
-                            type='default'
+                            type="default"
                             icon={<EditOutlined />}
                             onClick={handleEdit}
                             disabled={!selectedRowKey}
-                            tabIndex={2}
-                            aria-label="Editar seleccionado"
+                            tabIndex={3}
                         >
                             Editar
                         </Button>
-                    </Tooltip>
-                    <Tooltip title="Supr / Backspace">
                         <Button
-                            type='default'
+                            type="default"
                             icon={<DeleteOutlined />}
                             onClick={handleDelete}
                             disabled={!selectedRowKey}
-                            tabIndex={3}
-                            aria-label="Eliminar seleccionado"
+                            tabIndex={4}
                         />
-                    </Tooltip>
-                    <Tooltip title="Filtrar">
                         <Button
-                            type='default'
+                            type="default"
                             icon={<FilterOutlined />}
                             onClick={setOpenFilter}
-                            tabIndex={4}
-                            aria-label="Abrir filtros"
+                            tabIndex={5}
                         />
-                    </Tooltip>
+
+                    </div>
                 </div>
             </div>
 
-            {loading ? (
-                <Spin size="large" fullscreen tip="Cargando..." />
-            ) : (
-                <Table
+            {loading ? <Spin size="large" fullscreen tip="Cargando..." />
+                : <Table
                     columns={columns}
                     dataSource={data}
                     rowKey="id"
@@ -200,33 +265,32 @@ const TableList = ({
                         total: total,
                     }}
                     onChange={handleTableChange}
+                    expandedRowRender={expandexRow ? expandedRowRender : null}
+                    expandedRowKeys={expandedRowKey ? [expandedRowKey] : []}
+                    expandIcon={() => null}
+                    expandIconColumnIndex={expandexRow ? -1 : 0}
                     onRow={(record) => ({
                         onClick: () => handleRowClick(record),
-                        onDoubleClick: () => handleEdit(),
+                        onDoubleClick: () => handleEdit(record),
                     })}
                     rowClassName={(record) =>
                         record.id === selectedRowKey ? 'bg-blue-100' : ''
                     }
                     locale={{ emptyText: <CustomEmpty onAddNew={handleNew} /> }}
                 />
-            )}
+            }
 
             <BottomMessage>
-                {!selectedRowKey ? (
+                <Codes label={'↓ ↑ '} sub={' para moverte. '} />
+                {!selectedRowKey ? <Codes label={'Ctrl + N'} sub={'para agregar nuevo.'} /> :
                     <>
-                        Usa <Code>↓</Code> y <Code>↑</Code> para moverte.  
-                        <Code>Enter</Code> para editar, <Code>Ctrl + N</Code> para agregar nuevo.
+                        <Codes label={'Supr'} sub={'para eliminar, '} />
+                        <Codes label={'Enter'} /> o
+                        <Codes label={'doble click'} sub={'para modificar.'} />
                     </>
-                ) : (
-                    <>
-                        <Code fontWeight="bold">↓</Code> y <Code fontWeight="bold">↑</Code> para navegar,{" "}
-                        <Code fontWeight="bold">Supr</Code> para eliminar,{" "}
-                        <Code fontWeight="bold">Enter</Code> o doble click para modificar.
-                    </>
-                )}
+                }
             </BottomMessage>
 
-            {/* Filtro lateral */}
             <Drawer title="Búsqueda avanzada" onClose={onClose} open={openFilter}>
                 <Box as="form" className='flex flex-col h-[calc(100vh-105px)] justify-between' onSubmit={handleSubmitFilter}>
                     <div className='flex flex-col gap-4'>
@@ -239,6 +303,7 @@ const TableList = ({
                                 placeholder="Representante o compañía"
                             />
                         </FormControl>
+
                         <FormControl>
                             <FormLabel>{label} archivados</FormLabel>
                             <RadioGroup value={isChecked} onChange={handleCheckboxChange}>

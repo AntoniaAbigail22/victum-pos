@@ -2,6 +2,7 @@ import categoriesData from './categories.json';
 
 // Obtener todas las categorías
 export const indexCategories = async () => {
+  let response = { status: false };
   try {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -12,6 +13,15 @@ export const indexCategories = async () => {
         });
       }, 500);
     });
+
+    /*let fetch = await Fetcher({
+      method: 'GET',
+      url: `/products/${id}`
+  });
+
+  if (fetch.status == 200) {
+      response = { status: true, data: fetch.data };
+  }*/
   } catch (error) {
     throw new Error('Error al obtener categorías');
   }

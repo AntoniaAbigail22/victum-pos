@@ -7,23 +7,25 @@ const DepartmentsPage = () => {
   const [newCategory, setNewCategory] = useState({ name: '', description: '' });
 
   useEffect(() => {
-    // Obtener categorías al montar el componente
-    const fetchCategories = async () => {
-      try {
-        const response = await indexCategories();
-        // Asegurarse de que response.data sea un arreglo
-        if (Array.isArray(response.data)) {
-          setCategories(response.data);
-        } else {
-          console.error('La respuesta no es un arreglo de categorías');
-        }
-      } catch (error) {
-        console.error('Error al obtener las categorías:', error);
-      }
-    };
 
     fetchCategories();
   }, []);
+
+  // Obtener categorías al montar el componente
+  const fetchCategories = async () => {
+    try {
+      const response = await indexCategories();
+      console.log("🚀 ~ fetchCategories ~ response:", response)
+      // Asegurarse de que response.data sea un arreglo
+      if (Array.isArray(response.data)) {
+        setCategories(response.data);
+      } else {
+        console.error('La respuesta no es un arreglo de categorías');
+      }
+    } catch (error) {
+      console.error('Error al obtener las categorías:', error);
+    }
+  };
 
   const handleCreateCategory = async () => {
     try {
@@ -47,7 +49,7 @@ const DepartmentsPage = () => {
   return (
     <div>
       <h1>Categorías</h1>
-      
+
       {/* Formulario para crear una nueva categoría */}
       <div>
         <input
@@ -65,7 +67,6 @@ const DepartmentsPage = () => {
         <Button onClick={handleCreateCategory}>Crear Categoría</Button>
       </div>
 
-      {/* Tabla de categorías */}
       <Table>
         <Thead>
           <Tr>

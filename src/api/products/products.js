@@ -45,17 +45,22 @@ export const indexProducts = async ({ store, page = 1, search = '', archive = fa
     }
 };
 
-export const createProduct = async ({ product, store_id }) => {
+export const createProduct = async ({ product, variants, store_id, id }) => {
     let response = { status: false };
     
     try {
         let fetch = await Fetcher({
             method: 'POST',
-            url: `/products/${store_id}`,
+            url: `/products`,
             headers: {
                 'Content-Type': 'application/json'
             },
-            data: JSON.stringify(product)
+            data: JSON.stringify({
+                product,
+                variants, 
+                store_id,
+                id
+            })
         });
 
         if (fetch.status == 201) {

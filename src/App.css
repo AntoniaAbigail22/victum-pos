@@ -21,3 +21,47 @@
 .custom-table .ant-table-tbody > tr.selected-row > td {
   color: #1890ff; 
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+div#chakra-modal--body-\:r2q\: {
+    padding: 0;
+}
+
+
+
+
+.compact-table .ant-table-thead > tr > th {
+  padding: 4px 8px !important;
+  background: #f8f8f8;
+}
+.compact-table .ant-table-tbody > tr > td {
+  padding: 4px 8px !important;
+}
+.compact-table .ant-table-cell {
+  line-height: 1.2;
+}
+
+
+/* Mantener las columnas visibles */
+.compact-table .ant-table-placeholder {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.compact-table .ant-table-body {
+  min-height: 100px; /* Altura mínima para mantener el espacio */
+}
+
+/* Estilo para la tabla vacía */
+.compact-table .ant-table-tbody > tr.ant-table-placeholder:hover > td {
+  background: transparent;
+}
