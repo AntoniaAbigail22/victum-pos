@@ -28,8 +28,9 @@ function Login({ openSession }) {
     const [isSubmitting, setSubmitting] = useState(false);
 
     const [data, setData] = useState({
-        email: '',
-        password: ''
+        //email: 'eziocano23@hotmail.com', username: 'eziocano23', password: '1523',
+        //email: 'rico@gmail.com', username: 'rico', password: '123',
+        email: '', username: '', password: '',
     });
 
     const handleChange = (event) => {
