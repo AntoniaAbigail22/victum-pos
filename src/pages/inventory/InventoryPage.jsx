@@ -1,3 +1,47 @@
+ 
+import fs from 'fs';
+import path from 'path';
+
+ 
+const registrarVenta = (productosVendidos, metodoPago, pagoCon, cambio, nota, referencia = '') => {
+  
+  const productsPath = path.join(__dirname, '../../api/products/products.json');
+  const ticketsPath = path.join(__dirname, '../../api/tickets.json');
+  let productos = [];
+  let tickets = [];
+  try {
+    productos = JSON.parse(fs.readFileSync(productsPath, 'utf8')).data;
+    tickets = JSON.parse(fs.readFileSync(ticketsPath, 'utf8'));
+  } catch (e) { }
+
+  
+  productosVendidos.forEach(vendido => {
+    const prod = productos.find(p => p.id === vendido.id);
+    if (prod) {
+      prod.stock = (prod.stock || 0) - vendido.quantity;
+    }
+  });
+
+  
+  fs.writeFileSync(productsPath, JSON.stringify({ status: true, data: productos, total: productos.length }, null, 2));
+
+  
+  const total = productosVendidos.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+  const ticket = {
+    id: tickets.length ? tickets[tickets.length - 1].id + 1 : 1,
+    fecha: new Date().toISOString(),
+    productos: productosVendidos,
+    total,
+    metodoPago,
+    pagoCon,
+    cambio,
+    nota,
+    referencia
+  };
+  tickets.push(ticket);
+  fs.writeFileSync(ticketsPath, JSON.stringify(tickets, null, 2));
+  return ticket;
+};
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Space, notification } from 'antd';
 import { ExclamationCircleFilled, EditOutlined, DeleteOutlined, InboxOutlined, PictureOutlined, ShoppingOutlined } from '@ant-design/icons';
@@ -30,9 +74,21 @@ const InventoryPage = ({ type }) => {
     const [api, contextHolder] = notification.useNotification();
     const sendNotification = (type, description) => openNotification(api, type, description)
 
-    //const store = 1;
+    
     const information_user = useSelector(state => state.login.information_user);
-    const { user } = information_user;
+    const user = information_user?.user;
+    
+    if (!user) {
+        return (
+            <div className="w-full flex flex-col p-2">
+                <BreadcrumbHeader
+                    links={[{ href: '/inventory', label: 'Inventario' }, { label: 'Productos' }]}
+                    label={'Productos'}
+                />
+                <div className="text-center text-red-500 font-bold mt-8">No hay información de usuario disponible. Por favor inicia sesión.</div>
+            </div>
+        );
+    }
     const { store_id: store, id } = user;
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
@@ -71,7 +127,7 @@ const InventoryPage = ({ type }) => {
         price_sale: true,
         utility: true,
         stock: true,
-        //quanty_whole
+        
     };
 
     useEffect(() => {
@@ -129,14 +185,14 @@ const InventoryPage = ({ type }) => {
             const response = await createProduct({ product: formData, variants: variants, store_id: store, id })
             console.log("🚀 ~ addElement ~ response:", response)
             if (response?.status) {
-                //sendNotification('success', `Se agrego al ${getLabelTypeDirectory[type]} ${response?.data?.provider?.name} ${response?.data?.provider?.last_name} con éxito`)
+                
                 onClose()
             }
             else sendNotification('error')
         } catch (error) {
             console.log("🚀 ~ getDataList ~ error:", error)
         } finally {
-            //getDataList()
+            
         }
     };
 
@@ -231,7 +287,6 @@ const InventoryPage = ({ type }) => {
                             height: '40px',
                             objectFit: 'cover',
                             borderRadius: '8px',
-                            //border: '1px solid #ccc',
                         }}
                     />
                     <div className="flex flex-col justify-center">
@@ -244,14 +299,6 @@ const InventoryPage = ({ type }) => {
             sortDirections: ['ascend', 'descend'],
             width: 200,
         },
-        /*{
-            title: "Nombre",
-            dataIndex: "description",
-            key: "description",
-            //ellipsis: true,
-            sorter: (a, b) => a.description.localeCompare(b.description),
-            sortDirections: ['ascend', 'descend'],
-        },*/
     ];
 
 
@@ -316,7 +363,7 @@ const InventoryPage = ({ type }) => {
 
     const filterColumns = () => {
         const fix = columns;
-        /*if (type !== 1) fix.pop();
+        
         if (type == 4) fix.unshift({
             title: 'Dirección',
             key: 'address',
@@ -340,7 +387,7 @@ const InventoryPage = ({ type }) => {
                 </span>
             ),
             width: 1,
-        });*/
+        });
 
 
         const columnActions = [

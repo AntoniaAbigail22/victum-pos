@@ -1,0 +1,16 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Alfa Storage",
+      "address": "Calle 8 #100, Col. Industrial",
+      "monto": 10000
+    },
+    {
+      "id": 2,
+      "name": "Beta Depot",
+      "address": "Av. Las Palmas 200, Sur",
+      "monto": 5000
+    }
+  ]
+}

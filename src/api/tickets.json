@@ -1,0 +1,61 @@
+[
+  {
+    "id": 1,
+    "fecha": "2025-07-27T10:00:00",
+    "productos": [
+      {
+        "id": 1,
+        "barcode": "750123456789",
+        "name": "Lancetas Universales Estériles On Call 30 G",
+        "price": 178,
+        "quantity": 1
+      },
+      {
+        "id": 2,
+        "barcode": "750987654321",
+        "name": "Tiras Reactivas Contour Plus",
+        "price": 365,
+        "quantity": 2
+      },
+      {
+        "id": 3,
+        "barcode": "750555555555",
+        "name": "Glucómetro Accu-Chek",
+        "price": 850,
+        "quantity": 1
+      }
+    ],
+    "total": 1758,
+    "metodoPago": "efectivo",
+    "pagoCon": 2000,
+    "cambio": 242,
+    "nota": "Venta de prueba con varios productos",
+    "referencia": ""
+  },
+  {
+    "id": 2,
+    "fecha": "2025-07-27T11:00:00",
+    "productos": [
+      {
+        "id": 4,
+        "barcode": "750666666666",
+        "name": "Termómetro digital",
+        "price": 120,
+        "quantity": 3
+      },
+      {
+        "id": 5,
+        "barcode": "750777777777",
+        "name": "Alcohol en gel 500ml",
+        "price": 60,
+        "quantity": 5
+      }
+    ],
+    "total": 540,
+    "metodoPago": "tarjeta",
+    "pagoCon": 540,
+    "cambio": 0,
+    "nota": "Pago con tarjeta",
+    "referencia": "REF123456"
+  }
+]

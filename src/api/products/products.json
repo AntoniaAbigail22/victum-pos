@@ -10,7 +10,7 @@
       "price_whole": 14000.00,
       "quanty_whole": 10,
       "utility": 25.00,
-      "category": { "name": "Electrónicos" },
+      "department": { "name": "Electrónicos" },
       "image_url": null
     },
     {
@@ -22,9 +22,57 @@
       "price_whole": 300.00,
       "quanty_whole": 50,
       "utility": 75.00,
-      "category": { "name": "Accesorios" },
+      "department": { "name": "Accesorios" },
       "image_url": "https://example.com/mouse.jpg"
+    },
+    {
+      "id": 3,
+      "code": "PROD-003",
+      "description": "Teclado mecánico RGB",
+      "price_cost": 800.00,
+      "price_sale": 1200.00,
+      "price_whole": 1100.00,
+      "quanty_whole": 20,
+      "utility": 50.00,
+      "department": { "name": "Accesorios" },
+      "image_url": "https://example.com/teclado.jpg"
+    },
+    {
+      "id": 4,
+      "code": "PROD-004",
+      "description": "Monitor Samsung 24\"",
+      "price_cost": 3500.00,
+      "price_sale": 4200.00,
+      "price_whole": 4000.00,
+      "quanty_whole": 15,
+      "utility": 20.00,
+      "department": { "name": "Electrónicos" },
+      "image_url": "https://example.com/monitor.jpg"
+    },
+    {
+      "id": 5,
+      "code": "PROD-005",
+      "description": "Silla ergonómica",
+      "price_cost": 900.00,
+      "price_sale": 1500.00,
+      "price_whole": 1400.00,
+      "quanty_whole": 30,
+      "utility": 66.67,
+      "department": { "name": "Muebles" },
+      "image_url": "https://example.com/silla.jpg"
+    },
+    {
+      "id": 6,
+      "code": "PROD-006",
+      "description": "Audífonos Bluetooth",
+      "price_cost": 350.00,
+      "price_sale": 600.00,
+      "price_whole": 550.00,
+      "quanty_whole": 40,
+      "utility": 71.43,
+      "department": { "name": "Accesorios" },
+      "image_url": "https://example.com/audifonos.jpg"
     }
   ],
-  "total": 2
+  "total": 6
 }

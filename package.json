@@ -52,7 +52,7 @@
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
     "rsuite": "^5.78.1",
-    "sort-by": "^1.2.0",
+    "sort-by": "^0.0.2",
     "tailwindcss-animate": "^1.0.7",
     "vue": "^3.2.47",
     "xlsx": "^0.18.5",

@@ -15,27 +15,20 @@ const options = [
         url: 'warehouses'
     },
     {
-        title: 'Categorías',
+        title: 'Departamentos',
         description: 'Organización los productos por categoría',
         image: 'https://img.icons8.com/fluency/96/000000/department.png',
         url: 'departments'
     },
-    /*{
-        title: 'Reporte de Movimientos',
-        description: 'Registro y seguimiento de movimientos',
-        image: 'https://img.icons8.com/fluency/96/000000/document.png',
-        url: 'movement-report'
-    },*/
+
 
 ];
 
-const ProductsMenu = () => {
-
+const InventoryMenu = () => {
     const label = 'Inventario';
     const links = [{ href: '#', label }]
     const navigator = 'inventory';
-
     return <MainMenu options={options} navigator={navigator} links={links} />
 };
 
-export default ProductsMenu;
+export default InventoryMenu;

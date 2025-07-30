@@ -8,15 +8,17 @@ import Configuracion from './pages/Configuracion';
 import CorteCaja from './pages/CorteCaja';
 import './App.css';
 import DirectoryMenu from './components/DirectoryMenu';
-//import InventoryPage from './pages/InventoryPage';
-import DepartmentsPage from './pages/DepartmentsPage';
+
 import Login from './components/Login';
 import { store, persistor } from './redux/store';
 import Context from './redux/Context';
-import ProductsMenu from './components/ProductsMenu';
+import InventoryMenu from './components/InventoryMenu';
 import DirectoryPage from './pages/DirectoryPage';
 import InventoryPage from './pages/inventory/InventoryPage';
 import InventoryPageSave from './pages/inventory/InventoryPageSave';
+import ProductsPage from './pages/inventory/ProductsPage';
+import WarehousesPage from './pages/inventory/WarehousesPage';
+import DepartmentsPage from './pages/inventory/DepartmentsPage';
 import Ventas from './pages/Ventas';
 
 export const ROUTES = {
@@ -48,9 +50,7 @@ const App = () => {
     }), []);
     
     useEffect(() => {
-        // Este efecto ya no es necesario porque las actualizaciones
-        // se manejan en las funciones de signIn/signUp/signOut
-        // localStorage.setItem('userTokenVPOS', userToken.toString());
+
     }, [userToken]);
 
     return (
@@ -60,6 +60,7 @@ const App = () => {
                     {!userToken ? (
                         <Routes>
                             <Route path="/" index element={<Login />} />
+                            <Route path="/login" element={<Login />} />
                             <Route path="*" index element={<Login />} />
                         </Routes>
                     ) : (
@@ -71,12 +72,11 @@ const App = () => {
                                 <Route path={`/${ROUTES.COG}`} element={<Configuracion />} />
                                 <Route path={`/${ROUTES.COURT}`} element={<CorteCaja />} />
                                 
-                                <Route path={`/${ROUTES.INVENTORY}`} element={<ProductsMenu/> } />
-                                <Route path={`/${ROUTES.INVENTORY}/products`} element={<InventoryPage type={1} />} />
-                                <Route path={`/${ROUTES.INVENTORY}/:inventory_id`} element={<InventoryPage type={1} />} />
-                                <Route path={`/${ROUTES.INVENTORY}/warehouses`} element={<InventoryPage type={2} />} />
+                                <Route path={`/${ROUTES.INVENTORY}`} element={<InventoryMenu/> } />
+                                <Route path={`/${ROUTES.INVENTORY}/products`} element={<ProductsPage />} />
+                                <Route path={`/${ROUTES.INVENTORY}/warehouses`} element={<WarehousesPage />} />
+                                <Route path={`/${ROUTES.INVENTORY}/departments`} element={<DepartmentsPage />} />
                                 <Route path={`/${ROUTES.INVENTORY}/warehouses/saves`} element={<InventoryPageSave type={5}/>} />
-                                <Route path={`/${ROUTES.INVENTORY}/departments`} element={<InventoryPage type={3} />} />
                                 <Route path={`/${ROUTES.INVENTORY}/movement-report`} element={<InventoryPage type={4} />} />
                                 
 

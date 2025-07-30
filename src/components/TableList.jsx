@@ -13,6 +13,7 @@ import { Collapse } from 'antd';
 import { parse } from 'date-fns';
 const { Panel } = Collapse;
 
+// Nuevo prop: actionsColumn (columna de acciones personalizada)
 const TableList = ({
     columns,
     visibleColumns = [],
@@ -37,7 +38,8 @@ const TableList = ({
     isChecked,
     setIsChecked,
     expandexRow,
-    columnsExtras
+    columnsExtras,
+    actionsColumn
 }) => {
 
     const [selectedRowKey, setSelectedRowKey] = useState(null);
@@ -252,7 +254,7 @@ const TableList = ({
 
             {loading ? <Spin size="large" fullscreen tip="Cargando..." />
                 : <Table
-                    columns={columns}
+                    columns={actionsColumn ? [...columns, actionsColumn] : columns}
                     dataSource={data}
                     rowKey="id"
                     className='w-full custom-table pb-16'
