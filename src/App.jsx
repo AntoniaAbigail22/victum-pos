@@ -55,41 +55,34 @@ const App = () => {
 
     return (
         <Context.Provider value={authContext}>
-            <Provider store={store}>
-                <PersistGate loading={null} persistor={persistor}>
-                    {!userToken ? (
-                        <Routes>
-                            <Route path="/" index element={<Login />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="*" index element={<Login />} />
-                        </Routes>
-                    ) : (
-                        <Routes>
-                            <Route element={<LayoutComponent />}>
-                                <Route path={`/`} element={<Ventas />} />
-                                <Route path={`*`} element={<Ventas />} />
-                                 <Route path={`/${ROUTES.SALES}`} element={<Ventas />} />
-                                <Route path={`/${ROUTES.COG}`} element={<Configuracion />} />
-                                <Route path={`/${ROUTES.COURT}`} element={<CorteCaja />} />
-                                
-                                <Route path={`/${ROUTES.INVENTORY}`} element={<InventoryMenu/> } />
-                                <Route path={`/${ROUTES.INVENTORY}/products`} element={<ProductsPage />} />
-                                <Route path={`/${ROUTES.INVENTORY}/warehouses`} element={<WarehousesPage />} />
-                                <Route path={`/${ROUTES.INVENTORY}/departments`} element={<DepartmentsPage />} />
-                                <Route path={`/${ROUTES.INVENTORY}/warehouses/saves`} element={<InventoryPageSave type={5}/>} />
-                                <Route path={`/${ROUTES.INVENTORY}/movement-report`} element={<InventoryPage type={4} />} />
-                                
-
-                                <Route path={`/${ROUTES.DIRECTORY}`} element={<DirectoryMenu />} />
-                                <Route path={`/${ROUTES.DIRECTORY}/providers`} element={<DirectoryPage type={1} />} />
-                                <Route path={`/${ROUTES.DIRECTORY}/employees`} element={<DirectoryPage type={2} />} />
-                                <Route path={`/${ROUTES.DIRECTORY}/managers`} element={<DirectoryPage type={3} />} />
-                                <Route path={`/${ROUTES.DIRECTORY}/clients`} element={<DirectoryPage type={4} />} />
-                            </Route>
-                        </Routes>
-                    )}
-                </PersistGate>
-            </Provider>
+            {!userToken ? (
+                <Routes>
+                    <Route path="/" index element={<Login />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="*" index element={<Login />} />
+                </Routes>
+            ) : (
+                <Routes>
+                    <Route element={<LayoutComponent />}>
+                        <Route path={`/`} element={<Ventas />} />
+                        <Route path={`*`} element={<Ventas />} />
+                        <Route path={`/${ROUTES.SALES}`} element={<Ventas />} />
+                        <Route path={`/${ROUTES.COG}`} element={<Configuracion />} />
+                        <Route path={`/${ROUTES.COURT}`} element={<CorteCaja />} />
+                        <Route path={`/${ROUTES.INVENTORY}`} element={<InventoryMenu/> } />
+                        <Route path={`/${ROUTES.INVENTORY}/products`} element={<ProductsPage />} />
+                        <Route path={`/${ROUTES.INVENTORY}/warehouses`} element={<WarehousesPage />} />
+                        <Route path={`/${ROUTES.INVENTORY}/departments`} element={<DepartmentsPage />} />
+                        <Route path={`/${ROUTES.INVENTORY}/warehouses/saves`} element={<InventoryPageSave type={5}/>} />
+                        <Route path={`/${ROUTES.INVENTORY}/movement-report`} element={<InventoryPage type={4} />} />
+                        <Route path={`/${ROUTES.DIRECTORY}`} element={<DirectoryMenu />} />
+                        <Route path={`/${ROUTES.DIRECTORY}/providers`} element={<DirectoryPage type={1} />} />
+                        <Route path={`/${ROUTES.DIRECTORY}/employees`} element={<DirectoryPage type={2} />} />
+                        <Route path={`/${ROUTES.DIRECTORY}/managers`} element={<DirectoryPage type={3} />} />
+                        <Route path={`/${ROUTES.DIRECTORY}/clients`} element={<DirectoryPage type={4} />} />
+                    </Route>
+                </Routes>
+            )}
         </Context.Provider>
     );
 };

@@ -10,7 +10,7 @@ const { Header, Content } = Layout;
 const LayoutComponent = () => {
 
 	const navigate = useNavigate();
-	const { signOut } = useContext(Context);
+	const { signOut, user } = useContext(Context); // user para nombre
 
 	const location = useLocation();
 	const { pathname } = location;
@@ -33,9 +33,32 @@ const LayoutComponent = () => {
 
 	const onClickMenu = (route) => navigate(`/${route}`);
 
-	return (
-		<>
-			<Layout style={{ minHeight: '100vh' }}>
+const [open, setOpen] = useState(false);
+const menuRef = React.useRef(null);
+const userName = user?.name || "Atiende";
+
+// Cerrar menú al hacer click fuera
+useEffect(() => {
+  function handleClickOutside(event) {
+	if (menuRef.current && !menuRef.current.contains(event.target)) {
+	  setOpen(false);
+	}
+  }
+  if (open) document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, [open]);
+
+const handleConfig = () => {
+  setOpen(false);
+  navigate('/configuracion');
+};
+const handleSignOut = () => {
+  setOpen(false);
+  signOut();
+};
+
+return (
+	   <Layout style={{ minHeight: '100vh' }}>
 				<Header style={{
 					position: 'fixed',
 					top: 0,
@@ -71,11 +94,42 @@ const LayoutComponent = () => {
 								</button>
 							</div>
 						</div>
-						{/* Botón cerrar sesión */}
-						<div className="flex-shrink-0 flex flex-col items-center px-4">
-							<button onClick={signOut} style={{ background: '#007BFF', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 16px', cursor: 'pointer' }}>
-								Cerrar sesión
-							</button>
+						{/* Menú usuario tipo punto de venta */}
+						<div className="flex-shrink-0 flex flex-col items-center px-4 relative" ref={menuRef}>
+						  <button
+							onClick={() => setOpen((v) => !v)}
+							className="flex items-center gap-2 focus:outline-none hover:bg-blue-700 rounded px-2 py-1"
+							title="Usuario"
+						  >
+							<img
+							  src="https://img.icons8.com/ios-filled/40/ffffff/user-male-circle.png"
+							  alt="user"
+							  width="32"
+							  height="32"
+							  className="rounded-full border border-white"
+							/>
+							<span className="hidden md:inline text-sm font-semibold">{userName}</span>
+							<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 6l6 6 6-6"/></svg>
+						  </button>
+						  {open && (
+							<div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg z-50 animate-fade-in">
+							  <div className="px-4 py-2 border-b border-gray-200">
+								<div className="font-semibold">Atiende: {userName}</div>
+							  </div>
+							  <button
+								className="w-full text-left px-4 py-2 hover:bg-gray-100"
+								onClick={handleConfig}
+							  >
+								<span className="inline-block mr-2">⚙️</span> Configuración
+							  </button>
+							  <button
+								className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+								onClick={handleSignOut}
+							  >
+								<span className="inline-block mr-2">🚪</span> Cerrar sesión
+							  </button>
+							</div>
+						  )}
 						</div>
 					</nav>
 				</Header>
@@ -89,11 +143,8 @@ const LayoutComponent = () => {
 					</Content>
 				</Layout>
 
-			</Layout>
-		</>
-
-
-	);
+			   </Layout>
+	   );
 };
 
 export default LayoutComponent;

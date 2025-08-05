@@ -9,7 +9,7 @@ const reducer = (state = initialState, action) => {
         case "OPEN_":
             return {
                 ...state,
-                information_user: action.data
+                information_user: action.data.user ? action.data.user : action.data
             };
         default:
             return state;

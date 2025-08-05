@@ -64,11 +64,11 @@ function Login({ openSession }) {
             let response = await login({ data })
             console.log("🚀 ~ handleLogin ~ response:", response)
             if (response?.status) {
-                openSession(response?.data);
+                openSession(response?.data.user);
                 signIn();
                 toast({
                     title: 'Bienvenido',
-                    description: `Hola f, accediste a Victum POS.`,
+                    description: `Hola ${response?.data.user?.name || ''}, accediste a Victum POS.`,
                     status: 'success',
                     duration: 3000,
                     isClosable: true,
